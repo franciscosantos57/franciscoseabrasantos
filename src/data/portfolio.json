@@ -1,0 +1,97 @@
+{
+  "personal": {
+    "name": "Francisco Seabra Santos",
+    "role": "Computer Engineering Student @ UC",
+    "description": "I am a driven Computer Engineering student passionate about mastering new concepts and building impactful systems. I love tackling complex challenges, fueled by a competitive spirit to constantly improve. Always valuing genuine connections, I seek collaborations where we can exchange ideas, grow together, and make a real-world difference!",
+    "photo": "/photo.jpeg",
+    "links": {
+      "github": "https://github.com/franciscosantos57",
+      "linkedin": "https://linkedin.com/in/franciscoseabrasantos",
+      "email": "mailto:franciscoaldinhas@gmail.com",
+      "phone": "tel:+351962418501"
+    },
+    "cv": "CurriculumVitae.pdf"
+  },
+  "experience": [
+    {
+      "id": 1,
+      "title": "Freelance AI Engineer & Developer",
+      "company": "Importrust",
+      "location": "Coimbra, Portugal",
+      "period": "2025 - Present",
+      "description": "Engineered robust web-scraping solutions to efficiently gather, process, and analyze business-critical data. Developed and deployed AI-based tools and custom automation systems to optimize operational efficiency and streamline internal processes.",
+      "tags": ["AI", "Web Scraping", "Automation", "Python"]
+    },
+    {
+      "id": 2,
+      "title": "Junior Developer & Project Manager",
+      "company": "jeKnowledge",
+      "location": "Coimbra, Portugal",
+      "period": "2024 - Present",
+      "description": "Managed technical teams and oversaw full-stack software development lifecycles from conception to delivery. Collaborated in agile environments to build and deploy web applications focused on sustainability and gamification.",
+      "tags": ["Full-Stack", "Agile", "React", "Django"]
+    },
+    {
+      "id": 3,
+      "title": "Communication Collaborator",
+      "company": "Department of Informatics Engineering Student Union",
+      "location": "Coimbra, Portugal",
+      "period": "2024 - 2025",
+      "description": "Managed communication strategies and social media campaigns for major university tech events, including the 'Now What?' job fair and the 'Coimbra Blockchain' conference. Tailored technical messaging for diverse audiences and corporate partners.",
+      "tags": ["Communication", "Event Management", "Social Media"]
+    },
+    {
+      "id": 4,
+      "title": "Undergraduate Research Assistant",
+      "company": "Neuraspace & University of Coimbra",
+      "location": "Coimbra, Portugal",
+      "period": "2024",
+      "description": "Selected for a 6-month research grant in Evolutionary Computation. Applied Genetic Algorithms to optimize the routing of a space debris collection prototype, solving a complex aerospace challenge proposed by Neuraspace.",
+      "tags": ["Evolutionary Algorithms", "Research", "Python"]
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "title": "VozSaúde Telehealth System",
+      "description": "Architected an end-to-end telecommunication platform enabling elderly patients to communicate with doctors via automated voice-to-email and email-to-SMS pipelines. Engineered a Flask backend to orchestrate asynchronous AI processing (Whisper & LLaMA) seamlessly with Twilio telecom webhooks. Reached the semi-finals of the 'Arrisca C' competition.",
+      "tags": ["Python", "Flask", "Groq API", "Whisper", "LLaMA", "Twilio", "SMTP/IMAP"],
+      "github": "https://github.com/franciscosantos57/VozSaude",
+      "live": null,
+      "featured": true
+    },
+    {
+      "id": 2,
+      "title": "Human Activity Classifier",
+      "description": "Developed a machine learning pipeline to classify human activities using time-series data extracted from wearable body sensors. Applied advanced feature engineering techniques and classification algorithms to accurately identify and categorize different types of physical movement.",
+      "tags": ["Python", "PyTorch", "scikit-learn", "Pandas", "NumPy", "SciPy", "Matplotlib", "Seaborn"],
+      "github": "https://github.com/franciscosantos57/HumanActivityClassifier",
+      "live": null,
+      "featured": true
+    },
+    {
+      "id": 3,
+      "title": "APLM",
+      "description": "Engineered a gamified web platform designed to incentivize marine litter collection on beaches. Integrated a computer vision system to validate user-uploaded photographs of collected trash, automatically awarding points to maximize user engagement.",
+      "tags": ["React", "TypeScript", "SCSS", "Django", "Python"],
+      "github": null,
+      "live": null,
+      "featured": false
+    },
+    {
+      "id": 4,
+      "title": ".works Corporate Fair",
+      "description": "Led a cross-functional technical team to develop and launch the official website for a major university corporate and job fair. Managed the full project lifecycle, overseeing agile workflows, team communication, and ensuring a successful deployment.",
+      "tags": ["React", "TypeScript", "Tailwind CSS", "shadcn/ui", "Django", "Python", "Scrum", "Agile", "Git"],
+      "github": null,
+      "live": null,
+      "featured": false
+    }
+  ],
+  "contact": {
+    "message": "I'm always open to new opportunities and collaborations. Feel free to reach out!",
+    "email": "franciscoaldinhas@gmail.com",
+    "linkedin": "https://linkedin.com/in/franciscoseabrasantos",
+    "github": "https://github.com/franciscosantos57"
+  }
+}
