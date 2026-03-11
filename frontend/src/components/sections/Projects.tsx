@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Github, ExternalLink } from "lucide-react";
+import { GithubIcon, ExternalLink } from "lucide-react";
 import data from "@/data/portfolio.json";
 import vozsaudeSrc from "@/assets/vozsaude.jpg";
 import hacSrc from "@/assets/hac.jpg";
@@ -31,7 +31,7 @@ export default function Projects() {
   return (
     <section
       id="projects"
-      className="py-32 px-6 relative dot-bg"
+      className="py-20 px-5 md:py-32 md:px-6 relative dot-bg"
     >
       <div className="max-w-4xl flex flex-col gap-16" style={{ marginInline: "auto" }}>
         {/* Section header */}
@@ -70,22 +70,22 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
   const cover = PROJECT_COVERS[project.id];
   return (
     <div
-      className={`reveal reveal-delay-${Math.min(index + 1, 4)} group flex flex-row rounded-2xl border border-border bg-card overflow-hidden hover:border-[#3A6640]/40 hover:shadow-xl hover:shadow-[#3A6640]/10 transition-all duration-300`}
+      className={`reveal reveal-delay-${Math.min(index + 1, 4)} group flex flex-col sm:flex-row rounded-2xl border border-border bg-card overflow-hidden hover:border-[#3A6640]/40 hover:shadow-xl hover:shadow-[#3A6640]/10 transition-all duration-300`}
     >
-      {/* Cover image — left side, stretches to card height */}
+      {/* Cover image — full width on mobile, left side on desktop */}
       {cover && (
-        <div className="relative w-2/5 shrink-0 overflow-hidden">
+        <div className="relative w-full aspect-video sm:w-2/5 sm:aspect-auto shrink-0 overflow-hidden">
           <img
             src={cover}
             alt={project.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          {/* Accent line on right edge */}
-          <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-linear-to-b from-[#3A6640] to-[#5A9660]" />
+          {/* Accent line on right edge (desktop only) */}
+          <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-0.5 bg-linear-to-b from-[#3A6640] to-[#5A9660]" />
         </div>
       )}
 
-      <div className="flex flex-col gap-5 p-8 flex-1">
+      <div className="flex flex-col gap-5 p-5 sm:p-8 flex-1">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-xl font-bold group-hover:text-[#3A6640] transition-colors text-left">
             {project.title}
@@ -94,7 +94,7 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
             {project.github && (
               <a href={project.github} target="_blank" rel="noopener noreferrer">
                 <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-[#3A6640] hover:text-white transition-colors">
-                  <Github className="h-4 w-4" />
+                  <GithubIcon className="h-4 w-4" />
                 </Button>
               </a>
             )}
@@ -155,7 +155,7 @@ function SmallCard({ project, index }: { project: Project; index: number }) {
             {project.github && (
               <a href={project.github} target="_blank" rel="noopener noreferrer">
                 <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-[#3A6640] hover:text-white transition-colors">
-                  <Github className="h-3.5 w-3.5" />
+                  <GithubIcon className="h-3.5 w-3.5" />
                 </Button>
               </a>
             )}

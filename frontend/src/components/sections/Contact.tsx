@@ -1,4 +1,4 @@
-import { Mail, Linkedin, Github, ArrowUpRight } from "lucide-react";
+import { Mail, LinkedinIcon, GithubIcon, ArrowUpRight } from "lucide-react";
 import data from "@/data/portfolio.json";
 
 const contactLinks = [
@@ -13,21 +13,21 @@ const contactLinks = [
     label: "LinkedIn",
     value: "franciscoseabrasantos",
     href: data.contact.linkedin,
-    icon: Linkedin,
+    icon: LinkedinIcon,
     description: "Let's connect",
   },
   {
     label: "GitHub",
     value: "franciscosantos57",
     href: data.contact.github,
-    icon: Github,
+    icon: GithubIcon,
     description: "Check my work",
   },
 ];
 
 export default function Contact() {
   return (
-    <section id="contact" className="py-32 px-6 bg-muted/50">
+    <section id="contact" className="py-20 px-5 md:py-32 md:px-6 bg-muted/50">
       <div className="max-w-4xl mx-auto flex flex-col gap-16">
         {/* Section header */}
         <div className="reveal flex flex-col gap-3">

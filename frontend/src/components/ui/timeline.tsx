@@ -41,6 +41,75 @@ function buildPath(nodes: NodePos[], tailCy: number): string {
   return d;
 }
 
+// 3 weaving strands that converge exactly to anchorCxs[i] at every node
+// (so all strands meet at the sphere centre), then oscillate between nodes
+// via bezier control points. weavingPhase shifts the oscillation on scroll.
+function buildWeavingPath(
+  nodes: NodePos[], tailCy: number, phase: number, amplitude: number,
+  anchorCxs: number[]
+): string {
+  if (nodes.length === 0) return "";
+  let d = `M ${anchorCxs[0]} ${nodes[0].cy}`;
+  for (let i = 1; i < nodes.length; i++) {
+    const prev = nodes[i - 1], curr = nodes[i];
+    const midY = (prev.cy + curr.cy) / 2;
+    // oscillation peak lives at the midpoint between nodes
+    const t = ((i - 0.5) / Math.max(nodes.length - 1, 1)) * Math.PI * 3;
+    const osc = amplitude * Math.sin(t + phase);
+    d += ` C ${anchorCxs[i-1] + osc} ${midY}, ${anchorCxs[i] + osc} ${midY}, ${anchorCxs[i]} ${curr.cy}`;
+  }
+  d += ` L ${anchorCxs[anchorCxs.length - 1]} ${tailCy}`;
+  return d;
+}
+
+// Projects a 3-D cube to visible SVG polygon faces in painter's order —
+// same vertex math as FloatingCubes.tsx, outputs SVG-ready strings.
+function svgCubeFaces(
+  cx: number, cy: number, size: number, rotY: number, rotX: number
+): { key: number; points: string; shade: number }[] {
+  const h = size / 2;
+  const verts: [number, number, number][] = [
+    [-h, -h, -h], [h, -h, -h], [h, h, -h], [-h, h, -h],
+    [-h, -h,  h], [h, -h,  h], [h, h,  h], [-h, h,  h],
+  ];
+  const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+  const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+  const transformed = verts.map(([vx, vy, vz]): [number, number, number] => {
+    const rx  =  vx * cosY + vz * sinY;
+    const rz1 = -vx * sinY + vz * cosY;
+    const ry  =  vy * cosX - rz1 * sinX;
+    const rz  =  vy * sinX + rz1 * cosX;
+    return [cx + rx, cy + ry, rz];
+  });
+  const faces = [
+    { idx: [0, 1, 2, 3], nx:  0, ny:  0, nz: -1 },
+    { idx: [7, 6, 5, 4], nx:  0, ny:  0, nz:  1 },
+    { idx: [4, 5, 1, 0], nx:  0, ny: -1, nz:  0 },
+    { idx: [3, 2, 6, 7], nx:  0, ny:  1, nz:  0 },
+    { idx: [0, 3, 7, 4], nx: -1, ny:  0, nz:  0 },
+    { idx: [1, 5, 6, 2], nx:  1, ny:  0, nz:  0 },
+  ];
+  return faces
+    .map((face) => {
+      const rnz1 = -face.nx * sinY + face.nz * cosY;
+      const rnz  =  face.ny * sinX + rnz1 * cosX;
+      return { ...face, normalZ: rnz };
+    })
+    .filter((f) => f.normalZ > 0)
+    .sort((a, b) => {
+      const za = a.idx.reduce((s, j) => s + transformed[j][2], 0) / 4;
+      const zb = b.idx.reduce((s, j) => s + transformed[j][2], 0) / 4;
+      return za - zb;
+    })
+    .map((face, fi) => ({
+      key: fi,
+      points: face.idx
+        .map(j => `${transformed[j][0].toFixed(2)},${transformed[j][1].toFixed(2)}`)
+        .join(" "),
+      shade: face.normalZ,
+    }));
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
@@ -48,13 +117,19 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
   const thresholds = buildThresholds(n);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  // Refs point to the inner card wrapper (not the motion.div) so translateX from
-  // Framer Motion doesn't corrupt the vertical measurement
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const [svgDims, setSvgDims]         = useState({ w: 900, h: 1400 });
+  const [svgDims, setSvgDims]             = useState({ w: 900, h: 1400 });
   const [nodePositions, setNodePositions] = useState<NodePos[]>([]);
-  const [activeNodes, setActiveNodes] = useState<boolean[]>(new Array(n).fill(false));
+  const [activeNodes, setActiveNodes]     = useState<boolean[]>(new Array(n).fill(false));
+  const [isMobile, setIsMobile]           = useState(() => typeof window !== 'undefined' && window.innerWidth < 640);
+  const [weavingPhase, setWeavingPhase]   = useState(0);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // ── Measurement ─────────────────────────────────────────────────────────────
   const measure = useCallback(() => {
@@ -65,22 +140,38 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
     const w     = cRect.width;
     const h     = container.scrollHeight;
 
-    const positions: NodePos[] = cardRefs.current.map((ref, i) => {
-      const side: "left" | "right" = i % 2 === 0 ? "right" : "left";
-      // Node x sits just at the inner boundary of each 44%-wide card:
-      //   right card starts at 56% → node at 55%
-      //   left  card ends   at 44% → node at 45%
-      const cx = side === "right" ? w * 0.55 : w * 0.45;
-      if (!ref) return { cx, cy: 80 + i * 320, side };
-      const rRect = ref.getBoundingClientRect();
-      // translateX on the parent motion.div does NOT affect .top — safe to use
-      const cy = rRect.top - cRect.top + rRect.height / 2;
-      return { cx, cy, side };
-    });
-
-    setSvgDims({ w, h });
-    setNodePositions(positions);
-  }, []);
+    if (isMobile) {
+      const cx = w / 2;
+      const rects = cardRefs.current.map(ref => ref?.getBoundingClientRect() ?? null);
+      const positions: NodePos[] = rects.map((rect, i) => {
+        const prevRect = i > 0 ? rects[i - 1] : null;
+        let cy: number;
+        if (i === 0 && rect) {
+          // First node: in the top padding above the first card
+          cy = (rect.top - cRect.top) / 2;
+        } else if (rect && prevRect) {
+          // Between bottom of previous card and top of this card
+          cy = ((prevRect.bottom - cRect.top) + (rect.top - cRect.top)) / 2;
+        } else {
+          cy = 40 + i * 200;
+        }
+        return { cx, cy, side: 'right' as const };
+      });
+      setSvgDims({ w, h });
+      setNodePositions(positions);
+    } else {
+      const positions: NodePos[] = cardRefs.current.map((ref, i) => {
+        const side: "left" | "right" = i % 2 === 0 ? "right" : "left";
+        const cx = side === "right" ? w * 0.55 : w * 0.45;
+        if (!ref) return { cx, cy: 80 + i * 320, side };
+        const rRect = ref.getBoundingClientRect();
+        const cy = rRect.top - cRect.top + rRect.height / 2;
+        return { cx, cy, side };
+      });
+      setSvgDims({ w, h });
+      setNodePositions(positions);
+    }
+  }, [isMobile]);
 
   useEffect(() => {
     // RAF: Framer Motion has applied initial transforms by this point
@@ -110,15 +201,43 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
       });
       return next;
     });
+    setWeavingPhase(latest * Math.PI * 2);
   });
 
   // ── SVG path ────────────────────────────────────────────────────────────────
-  const tailCy  = nodePositions.length > 0
+  const tailCy     = nodePositions.length > 0
     ? nodePositions[nodePositions.length - 1].cy + 240
     : svgDims.h * 0.9;
-  const svgPath = buildPath(nodePositions, tailCy);
-  // viewBox matches the rendered pixel size exactly → 1 SVG unit = 1 CSS px
-  const viewBox = `0 0 ${svgDims.w} ${svgDims.h}`;
+  const svgPath    = buildPath(nodePositions, tailCy);
+  const mobilePath = `M ${svgDims.w / 2} 0 L ${svgDims.w / 2} ${svgDims.h}`;
+  const activePath = isMobile ? mobilePath : svgPath;
+  const viewBox    = `0 0 ${svgDims.w} ${svgDims.h}`;
+
+  // ── Weaving strand paths (scroll-driven phase shifts the crossing points) ──
+  const A = 28; // lateral amplitude in SVG units
+
+  // Sphere centre for each node — all 3 strands anchor here so the
+  // junction with the globe is perfectly seamless
+  const sphereCxs: number[] = nodePositions.map((node, i) => {
+    const t_i = n > 1 ? (i / (n - 1)) * Math.PI * 3 : 0;
+    return node.cx + (isMobile ? 0 : A * 0.15 * Math.sin(t_i + weavingPhase));
+  });
+
+  const strand1d = nodePositions.length > 0
+    ? (isMobile
+        ? `M ${svgDims.w / 2 - 9} 0 L ${svgDims.w / 2 - 9} ${svgDims.h}`
+        : buildWeavingPath(nodePositions, tailCy, weavingPhase, A, sphereCxs))
+    : "";
+  const strand2d = nodePositions.length > 0
+    ? (isMobile
+        ? `M ${svgDims.w / 2} 0 L ${svgDims.w / 2} ${svgDims.h}`
+        : buildWeavingPath(nodePositions, tailCy, weavingPhase + Math.PI * 2 / 3, A, sphereCxs))
+    : "";
+  const strand3d = nodePositions.length > 0
+    ? (isMobile
+        ? `M ${svgDims.w / 2 + 9} 0 L ${svgDims.w / 2 + 9} ${svgDims.h}`
+        : buildWeavingPath(nodePositions, tailCy, weavingPhase + Math.PI * 4 / 3, A, sphereCxs))
+    : "";
 
   return (
     <div
@@ -126,88 +245,120 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
       className="relative w-full max-w-4xl px-4 pb-24"
       style={{ marginInline: "auto" }}
     >
-      {/* SVG absolute overlay — fills container at 1:1 pixel scale */}
-      {svgPath && (
+      {/* SVG absolute overlay — always behind cards */}
+      {activePath && (
         <svg
           viewBox={viewBox}
-          className="absolute left-0 top-0 w-full pointer-events-none"
+          className="absolute left-0 top-0 w-full pointer-events-none z-0"
           style={{ height: svgDims.h }}
           preserveAspectRatio="none"
           aria-hidden="true"
         >
           <defs>
-            {/* Gradient in userSpaceOnUse so coordinates are real CSS pixels */}
-            <linearGradient
-              id="tlGrad"
-              gradientUnits="userSpaceOnUse"
-              x1={svgDims.w / 2} y1="0"
-              x2={svgDims.w / 2} y2={tailCy}
-            >
+            {/* Strand 1 — lightest, drawn on top */}
+            <linearGradient id="tlGrad1" gradientUnits="userSpaceOnUse"
+              x1={svgDims.w / 2} y1="0" x2={svgDims.w / 2} y2={isMobile ? svgDims.h : tailCy}>
+              <stop offset="0%"   stopColor="#6BBF72" />
+              <stop offset="88%"  stopColor="#3A6640" />
+              <stop offset="100%" stopColor="#3A6640" stopOpacity="0" />
+            </linearGradient>
+            {/* Strand 2 — mid tone */}
+            <linearGradient id="tlGrad2" gradientUnits="userSpaceOnUse"
+              x1={svgDims.w / 2} y1="0" x2={svgDims.w / 2} y2={isMobile ? svgDims.h : tailCy}>
               <stop offset="0%"   stopColor="#5A9660" />
               <stop offset="88%"  stopColor="#3A6640" />
               <stop offset="100%" stopColor="#3A6640" stopOpacity="0" />
             </linearGradient>
+            {/* Strand 3 — darkest, drawn behind */}
+            <linearGradient id="tlGrad3" gradientUnits="userSpaceOnUse"
+              x1={svgDims.w / 2} y1="0" x2={svgDims.w / 2} y2={isMobile ? svgDims.h : tailCy}>
+              <stop offset="0%"   stopColor="#4A8050" />
+              <stop offset="88%"  stopColor="#2E5234" />
+              <stop offset="100%" stopColor="#2E5234" stopOpacity="0" />
+            </linearGradient>
+
           </defs>
 
-          {/* Ghost track */}
-          <path d={svgPath} fill="none" stroke="#3A6640" strokeWidth="2.5" strokeOpacity="0.12" strokeLinecap="round" />
+          {/* Strand 3 — behind */}
+          {strand3d && (
+            <motion.path d={strand3d} fill="none" stroke="url(#tlGrad3)" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.60" style={{ pathLength }} />
+          )}
 
-          {/* Animated drawing line */}
-          <motion.path d={svgPath} fill="none" stroke="url(#tlGrad)" strokeWidth="2.5" strokeLinecap="round" style={{ pathLength }} />
+          {/* Strand 2 — middle */}
+          {strand2d && (
+            <motion.path d={strand2d} fill="none" stroke="url(#tlGrad2)" strokeWidth="2.5" strokeLinecap="round" strokeOpacity="0.80" style={{ pathLength }} />
+          )}
 
-          {/* Nodes */}
-          {nodePositions.map((node, i) => (
-            <React.Fragment key={i}>
-              <motion.circle
-                cx={node.cx} cy={node.cy} r="10"
-                fill="white" stroke="#3A6640" strokeWidth="2.5"
+          {/* Strand 1 — front */}
+          {strand1d && (
+            <motion.path d={strand1d} fill="none" stroke="url(#tlGrad1)" strokeWidth="2.5" strokeLinecap="round" style={{ pathLength }} />
+          )}
+
+          {/* Nodes — rotating 3D cubes (same renderer as FloatingCubes) */}
+          {nodePositions.map((node, i) => {
+            const S = 38;
+            const t_i = n > 1 ? (i / (n - 1)) * Math.PI * 3 : 0;
+            const scx = node.cx + (isMobile ? 0 : A * 0.15 * Math.sin(t_i + weavingPhase));
+            const cy  = node.cy;
+            // Both axes scroll-driven at different rates → natural tumble
+            const rotY = weavingPhase * 1.2 + t_i * 0.8;
+            const rotX = weavingPhase * 0.7 + i * 0.45;
+            const faces = svgCubeFaces(scx, cy, S, rotY, rotX);
+            return (
+              <motion.g
+                key={i}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={activeNodes[i] ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                style={{ transformOrigin: `${node.cx}px ${node.cy}px` }}
-              />
-              <motion.circle
-                cx={node.cx} cy={node.cy} r="4"
-                fill="#3A6640"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={activeNodes[i] ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.08 }}
-                style={{ transformOrigin: `${node.cx}px ${node.cy}px` }}
-              />
-            </React.Fragment>
-          ))}
+                style={{ transformOrigin: `${scx}px ${cy}px` }}
+              >
+                {/* mask: background circle hides strands behind the cube;
+                    the area between cube silhouette and circle edge shows bg color
+                    which is invisible since it matches the page background */}
+                <circle cx={scx} cy={cy} r={S} fill="var(--background)" />
+                {faces.map(({ key: fk, points, shade }) => (
+                  <polygon
+                    key={fk}
+                    points={points}
+                    fill={`rgba(90,150,96,${(0.08 + shade * 0.50).toFixed(3)})`}
+                    stroke={`rgba(107,191,114,${(0.35 + shade * 0.55).toFixed(3)})`}
+                    strokeWidth="1"
+                  />
+                ))}
+              </motion.g>
+            );
+          })}
         </svg>
       )}
 
       {/* Cards column — ref on the inner wrapper so x-translate doesn't pollute cy measurement */}
-      <div className="flex flex-col gap-20 pt-10 pb-10">
+      <div className="flex flex-col gap-28 pt-10 pb-10">
         {data.map((item, i) => {
           const side: "left" | "right" = i % 2 === 0 ? "right" : "left";
+          const justify = isMobile ? "justify-center" : side === "right" ? "justify-end" : "justify-start";
+          const initX   = isMobile ? 0 : side === "right" ? 48 : -48;
           return (
             <motion.div
               key={i}
-              className={`flex w-full ${side === "right" ? "justify-end" : "justify-start"}`}
-              // No scale — translateX only; doesn't affect top/height measurement
-              initial={{ opacity: 0, x: side === "right" ? 48 : -48 }}
+              className={`relative z-10 flex w-full ${justify}`}
+              initial={{ opacity: 0, x: initX }}
               animate={
                 activeNodes[i]
                   ? { opacity: 1, x: 0 }
-                  : { opacity: 0, x: side === "right" ? 48 : -48 }
+                  : { opacity: 0, x: initX }
               }
               transition={{ type: "spring", stiffness: 200, damping: 26, delay: 0.1 }}
             >
               <div
                 ref={(el) => { cardRefs.current[i] = el; }}
-                className="w-[41%] flex flex-col gap-2"
+                className={`${isMobile ? "w-full" : "w-[38%]"} flex flex-col gap-2`}
               >
                 <p className={`text-xs font-mono text-[#3A6640] tracking-widest ${
                   side === "left" ? "text-right" : "text-left"
                 }`}>
                   {item.title}
                 </p>
-                <div className="w-full bg-card border border-[#3A6640]/15 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-[#3A6640]/30 transition-all duration-300">
-                  {item.content}
-                </div>
+                {item.content}
               </div>
             </motion.div>
           );

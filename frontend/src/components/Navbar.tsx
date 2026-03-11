@@ -43,6 +43,7 @@ export default function Navbar({ isDark, onToggleDark }: NavbarProps) {
   };
 
   return (
+    <>
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
@@ -50,7 +51,7 @@ export default function Navbar({ isDark, onToggleDark }: NavbarProps) {
           : "bg-transparent"
       }`}
     >
-      <div className="w-full px-10 h-16 flex items-center justify-between">
+      <div className="w-full px-4 md:px-10 h-16 flex items-center justify-between">
         {/* Logo / Name */}
         <button
           onClick={() => handleNav("#home")}
@@ -99,32 +100,54 @@ export default function Navbar({ isDark, onToggleDark }: NavbarProps) {
           {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
       </div>
+    </header>
 
-      {/* Mobile drawer */}
+      {/* Mobile full-screen overlay — sibling of header to avoid fixed-in-fixed clipping */}
       {menuOpen && (
-        <div className="md:hidden bg-background border-b border-border px-6 pb-4 flex flex-col gap-1">
-          {navLinks.map(({ label, href }) => (
+        <div className="md:hidden fixed inset-0 z-40 bg-background flex flex-col">
+          {/* Header row — same height as navbar */}
+          <div className="w-full px-4 h-16 flex items-center justify-between border-b border-border">
             <button
-              key={href}
-              onClick={() => handleNav(href)}
-              className={`w-full text-right px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                active === href.replace("#", "")
-                  ? "text-[#3A6640] font-semibold bg-[#3A6640]/8"
-                  : "text-foreground/60 hover:text-[#3A6640] hover:bg-[#3A6640]/8"
-              }`}
+              onClick={() => handleNav("#home")}
+              className="font-bold text-lg tracking-tight"
             >
-              {label}
+              <span className="bg-linear-to-r from-[#3A6640] to-[#5A9660] bg-clip-text text-transparent">Francisco</span>{" "}
+              <span className="text-foreground">Santos</span>
             </button>
-          ))}
-          <button
-            onClick={onToggleDark}
-            className="w-full text-right px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-[#3A6640] hover:bg-[#3A6640]/8 transition-all flex items-center justify-end gap-2"
-          >
-            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            {isDark ? "Light mode" : "Dark mode"}
-          </button>
+            <Button variant="ghost" size="icon" onClick={() => setMenuOpen(false)} aria-label="Close menu">
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Nav links — centred, large */}
+          <div className="flex flex-col items-center justify-center flex-1 gap-2">
+            {navLinks.map(({ label, href }) => (
+              <button
+                key={href}
+                onClick={() => handleNav(href)}
+                className={`w-full max-w-xs text-center px-6 py-4 rounded-xl text-lg font-medium transition-all ${
+                  active === href.replace("#", "")
+                    ? "text-[#3A6640] font-semibold bg-[#3A6640]/8"
+                    : "text-foreground/60 hover:text-[#3A6640] hover:bg-[#3A6640]/8"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Dark mode toggle at bottom */}
+          <div className="pb-10 flex justify-center">
+            <button
+              onClick={onToggleDark}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-[#3A6640] hover:bg-[#3A6640]/8 transition-all"
+            >
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {isDark ? "Light mode" : "Dark mode"}
+            </button>
+          </div>
         </div>
       )}
-    </header>
+    </>
   );
 }

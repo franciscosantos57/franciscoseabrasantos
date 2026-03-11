@@ -1,7 +1,7 @@
-import { Github, Linkedin, Mail, Phone, Download, ArrowDown } from "lucide-react";
+import { GithubIcon, LinkedinIcon, Mail, Phone, Download, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { FloatingCircles } from "@/components/ui/FloatingCircles";
+import { FloatingCubes } from "@/components/ui/FloatingCubes";
 import data from "@/data/portfolio.json";
 import photoSrc from "@/assets/photo.jpeg";
 
@@ -9,12 +9,12 @@ const socialLinks = [
   {
     label: "GitHub",
     href: data.personal.links.github,
-    icon: Github,
+    icon: GithubIcon,
   },
   {
     label: "LinkedIn",
     href: data.personal.links.linkedin,
-    icon: Linkedin,
+    icon: LinkedinIcon,
   },
   {
     label: "Email",
@@ -40,7 +40,7 @@ export default function Home() {
     >
       {/* Background: interactive floating circles + corner glows + overlay */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <FloatingCircles />
+        <FloatingCubes />
         {/* Top-left corner glow */}
         <div className="absolute -top-24 -left-24 w-105 h-105 rounded-full bg-[#3A6640]/12 blur-3xl" />
         {/* Bottom-right corner glow */}
@@ -123,7 +123,7 @@ export default function Home() {
       {/* Scroll down hint */}
       <button
         onClick={scrollToNext}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-muted-foreground hover:text-[#3A6640] transition-colors animate-bounce"
+        className="hidden sm:block absolute bottom-8 left-1/2 -translate-x-1/2 text-muted-foreground hover:text-[#3A6640] transition-colors animate-bounce"
         aria-label="Scroll down"
       >
         <ArrowDown className="h-5 w-5" />
