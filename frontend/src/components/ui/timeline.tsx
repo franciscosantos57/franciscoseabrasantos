@@ -124,6 +124,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
   const [activeNodes, setActiveNodes]     = useState<boolean[]>(new Array(n).fill(false));
   const [isMobile, setIsMobile]           = useState(() => typeof window !== 'undefined' && window.innerWidth < 640);
   const [weavingPhase, setWeavingPhase]   = useState(0);
+  const [tipProgress, setTipProgress]     = useState(0);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
@@ -147,8 +148,8 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
         const prevRect = i > 0 ? rects[i - 1] : null;
         let cy: number;
         if (i === 0 && rect) {
-          // First node: in the top padding above the first card
-          cy = (rect.top - cRect.top) / 2;
+          // First node: ensure sphere (r=38) + spring margin never clips at SVG top
+          cy = Math.max(60, (rect.top - cRect.top) / 2);
         } else if (rect && prevRect) {
           // Between bottom of previous card and top of this card
           cy = ((prevRect.bottom - cRect.top) + (rect.top - cRect.top)) / 2;
@@ -202,7 +203,13 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
       return next;
     });
     setWeavingPhase(latest * Math.PI * 2);
+    setTipProgress(latest);
   });
+
+  // ── Tip fade mask (fades the animated leading edge of the strands) ──────────
+  const FADE_ZONE_PX  = 130;
+  const tipFadeEndY   = tipProgress * svgDims.h;
+  const tipFadeStartY = Math.max(0, tipFadeEndY - FADE_ZONE_PX);
 
   // ── SVG path ────────────────────────────────────────────────────────────────
   const tailCy     = nodePositions.length > 0
@@ -242,7 +249,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-4xl px-4 pb-24"
+      className="relative w-full max-w-4xl px-4 pb-24 pt-14"
       style={{ marginInline: "auto" }}
     >
       {/* SVG absolute overlay — always behind cards */}
@@ -251,6 +258,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
           viewBox={viewBox}
           className="absolute left-0 top-0 w-full pointer-events-none z-0"
           style={{ height: svgDims.h }}
+          overflow="visible"
           preserveAspectRatio="none"
           aria-hidden="true"
         >
@@ -277,22 +285,39 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
               <stop offset="100%" stopColor="#2E5234" stopOpacity="0" />
             </linearGradient>
 
+            {/* Tip fade: gradient mask so the animated leading edge fades to transparent */}
+            <linearGradient id="tipFadeGrad" gradientUnits="userSpaceOnUse"
+              x1="0" y1={tipFadeStartY} x2="0" y2={Math.max(tipFadeEndY, tipFadeStartY + 1)}>
+              <stop offset="0%"   stopColor="white" />
+              <stop offset="100%" stopColor="white" stopOpacity="0" />
+            </linearGradient>
+            <mask id="tipFadeMask">
+              {tipFadeStartY > 0 && (
+                <rect x="0" y="0" width={svgDims.w} height={tipFadeStartY} fill="white" />
+              )}
+              <rect x="0" y={tipFadeStartY} width={svgDims.w}
+                height={Math.max(1, tipFadeEndY - tipFadeStartY + 1)}
+                fill="url(#tipFadeGrad)" />
+            </mask>
           </defs>
 
-          {/* Strand 3 — behind */}
-          {strand3d && (
-            <motion.path d={strand3d} fill="none" stroke="url(#tlGrad3)" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.60" style={{ pathLength }} />
-          )}
+          {/* Strands — wrapped in mask so the animated tip fades out */}
+          <g mask="url(#tipFadeMask)">
+            {/* Strand 3 — behind */}
+            {strand3d && (
+              <motion.path d={strand3d} fill="none" stroke="url(#tlGrad3)" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.60" style={{ pathLength }} />
+            )}
 
-          {/* Strand 2 — middle */}
-          {strand2d && (
-            <motion.path d={strand2d} fill="none" stroke="url(#tlGrad2)" strokeWidth="2.5" strokeLinecap="round" strokeOpacity="0.80" style={{ pathLength }} />
-          )}
+            {/* Strand 2 — middle */}
+            {strand2d && (
+              <motion.path d={strand2d} fill="none" stroke="url(#tlGrad2)" strokeWidth="2.5" strokeLinecap="round" strokeOpacity="0.80" style={{ pathLength }} />
+            )}
 
-          {/* Strand 1 — front */}
-          {strand1d && (
-            <motion.path d={strand1d} fill="none" stroke="url(#tlGrad1)" strokeWidth="2.5" strokeLinecap="round" style={{ pathLength }} />
-          )}
+            {/* Strand 1 — front */}
+            {strand1d && (
+              <motion.path d={strand1d} fill="none" stroke="url(#tlGrad1)" strokeWidth="2.5" strokeLinecap="round" style={{ pathLength }} />
+            )}
+          </g>
 
           {/* Nodes — rotating 3D cubes (same renderer as FloatingCubes) */}
           {nodePositions.map((node, i) => {
@@ -309,7 +334,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
                 key={i}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={activeNodes[i] ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 26 }}
                 style={{ transformOrigin: `${scx}px ${cy}px` }}
               >
                 {/* mask: background circle hides strands behind the cube;
@@ -332,7 +357,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
       )}
 
       {/* Cards column — ref on the inner wrapper so x-translate doesn't pollute cy measurement */}
-      <div className="flex flex-col gap-28 pt-10 pb-10">
+      <div className="flex flex-col gap-28 sm:pt-0 pt-10 pb-10">
         {data.map((item, i) => {
           const side: "left" | "right" = i % 2 === 0 ? "right" : "left";
           const justify = isMobile ? "justify-center" : side === "right" ? "justify-end" : "justify-start";

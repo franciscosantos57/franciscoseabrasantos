@@ -36,7 +36,8 @@ export default function Home() {
   return (
     <section
       id="home"
-      className="min-h-screen flex flex-col items-center justify-center relative px-6 pt-16"
+      className="min-h-[100dvh] flex flex-col items-center justify-center relative px-6 pt-16"
+      style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
     >
       {/* Background: interactive floating circles + corner glows + overlay */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

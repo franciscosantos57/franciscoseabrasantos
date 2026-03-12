@@ -151,18 +151,26 @@ export function FloatingCubes() {
     resize();
     window.addEventListener("resize", resize);
 
-    const onMove = (e: MouseEvent) => {
+    const onMove = (e: PointerEvent) => {
+      // Ignore touch/stylus — only real mouse pointer should trigger the proximity effect.
+      if (e.pointerType !== 'mouse') return;
       const rect = canvas.getBoundingClientRect();
       mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
-    window.addEventListener("mousemove", onMove);
+    const onLeave = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      mouseRef.current = { x: -9999, y: -9999 };
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerleave", onLeave);
 
     rafRef.current = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerleave", onLeave);
     };
   }, []);
 
