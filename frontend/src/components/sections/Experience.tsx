@@ -72,7 +72,7 @@ export default function Experience() {
       className="experience-bg bg-muted/50 overflow-hidden relative"
     >
       {/* Section header */}
-      <div className="max-w-4xl mx-auto px-5 pt-20 pb-10 md:px-6 md:pt-32 md:pb-12 reveal flex flex-col gap-3">
+      <div className="max-w-4xl mx-auto px-5 pt-20 pb-10 md:px-6 md:pt-32 md:pb-4 reveal flex flex-col gap-3">
         <p className="text-sm font-mono text-[#3A6640] tracking-widest uppercase">
           career
         </p>

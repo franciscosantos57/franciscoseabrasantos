@@ -249,7 +249,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-4xl px-4 pb-24 pt-14"
+      className="relative w-full max-w-4xl px-4 pb-24 pt-14 md:pt-4"
       style={{ marginInline: "auto" }}
     >
       {/* SVG absolute overlay — always behind cards */}
