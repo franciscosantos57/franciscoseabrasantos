@@ -156,8 +156,8 @@ html.dark .experience-bg {
     -55deg,
     transparent,
     transparent 36px,
-    rgba(58,102,64,0.09) 36px,
-    rgba(58,102,64,0.09) 37px
+    rgba(96,153,105,0.18) 36px,
+    rgba(96,153,105,0.18) 37px
   );
 }
 
@@ -169,11 +169,28 @@ html.dark .home-bg-overlay {
   background: radial-gradient(ellipse 62% 58% at 50% 46%, rgba(42,42,42,0.65) 0%, transparent 100%);
 }
 
-/* ── Dot background (projects section, dark-mode aware) ──── */
-.dot-bg {
-  background-image: radial-gradient(circle, rgba(58,102,64,0.22) 1.5px, transparent 1.5px);
+/* ── Projects section grid background ─────────────────────── */
+.project-grid-wrap {
+  background:
+    radial-gradient(circle at 16% 18%, rgba(58,102,64,0.045), transparent 32%),
+    radial-gradient(circle at 82% 74%, rgba(58,102,64,0.035), transparent 34%);
+}
+.project-grid-base {
+  background-image:
+    linear-gradient(rgba(58,102,64,0.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(58,102,64,0.075) 1px, transparent 1px);
   background-size: 28px 28px;
 }
-html.dark .dot-bg {
-  background-image: radial-gradient(circle, rgba(160,160,160,0.14) 1.5px, transparent 1.5px);
+.project-grid-depth {
+  opacity: 0.9;
+}
+html.dark .project-grid-wrap {
+  background:
+    radial-gradient(circle at 16% 18%, rgba(123,196,127,0.035), transparent 32%),
+    radial-gradient(circle at 82% 74%, rgba(123,196,127,0.03), transparent 34%);
+}
+html.dark .project-grid-base {
+  background-image:
+    linear-gradient(rgba(160,160,160,0.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(160,160,160,0.075) 1px, transparent 1px);
 }

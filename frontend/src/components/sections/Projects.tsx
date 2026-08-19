@@ -1,11 +1,13 @@
+import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { GithubIcon, ExternalLink } from "lucide-react";
+import { ProjectGridBackground } from "@/components/ui/ProjectGridBackground";
+import { GithubIcon, Link as LinkIcon } from "lucide-react";
 import data from "@/data/portfolio.json";
-import vozsaudeSrc from "@/assets/vozsaude.jpg";
-import hacSrc from "@/assets/hac.jpg";
-import aplmSrc from "@/assets/aplm.jpg";
-import dotworksSrc from "@/assets/dotworks.jpg";
+import vozsaudeSrc from "@/assets/vozsaude.png";
+import hacSrc from "@/assets/hac.png";
+import aplmSrc from "@/assets/aplm.png";
+import dotworksSrc from "@/assets/dotworks.png";
 
 interface Project {
   id: number;
@@ -31,10 +33,10 @@ export default function Projects() {
   return (
     <section
       id="projects"
-      className="py-20 px-5 md:py-32 md:px-6 relative dot-bg"
+      className="py-20 px-5 md:py-32 md:px-6 relative overflow-hidden bg-background"
     >
-      <div className="max-w-4xl flex flex-col gap-16" style={{ marginInline: "auto" }}>
-        {/* Section header */}
+      <ProjectGridBackground />
+      <div className="relative z-10 max-w-4xl flex flex-col gap-16" style={{ marginInline: "auto" }}>
         <div className="reveal flex flex-col gap-3">
           <p className="text-sm font-mono text-[#3A6640] tracking-widest uppercase">portfolio</p>
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Projects</h2>
@@ -68,11 +70,11 @@ export default function Projects() {
 
 function FeaturedCard({ project, index }: { project: Project; index: number }) {
   const cover = PROJECT_COVERS[project.id];
+
   return (
     <div
       className={`reveal reveal-delay-${Math.min(index + 1, 4)} group flex flex-col sm:flex-row rounded-2xl border border-border bg-card overflow-hidden hover:border-[#3A6640]/40 hover:shadow-xl hover:shadow-[#3A6640]/10 transition-all duration-300`}
     >
-      {/* Cover image — full width on mobile, left side on desktop */}
       {cover && (
         <div className="relative w-full aspect-video sm:w-2/5 sm:aspect-auto shrink-0 overflow-hidden">
           <img
@@ -80,61 +82,28 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
             alt={project.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          {/* Accent line on right edge (desktop only) */}
           <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-0.5 bg-linear-to-b from-[#3A6640] to-[#5A9660]" />
         </div>
       )}
 
-      <div className="flex flex-col gap-5 p-5 sm:p-8 flex-1">
-        <div className="flex items-start justify-between gap-4">
-          <h3 className="text-xl font-bold group-hover:text-[#3A6640] transition-colors text-left">
-            {project.title}
-          </h3>
-          <div className="flex gap-1 shrink-0">
-            {project.github && (
-              <a href={project.github} target="_blank" rel="noopener noreferrer">
-                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-[#3A6640] hover:text-white transition-colors">
-                  <GithubIcon className="h-4 w-4" />
-                </Button>
-              </a>
-            )}
-            {project.live && (
-              <a href={project.live} target="_blank" rel="noopener noreferrer">
-                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-[#3A6640] hover:text-white transition-colors">
-                  <ExternalLink className="h-4 w-4" />
-                </Button>
-              </a>
-            )}
-          </div>
-        </div>
-
-        <p className="text-muted-foreground text-sm leading-relaxed text-left flex-1">
-          {project.description}
-        </p>
-
-        <div className="flex flex-wrap gap-2">
-          {project.tags.map((tag) => (
-            <Badge
-              key={tag}
-              variant="outline"
-              className="text-xs rounded-full bg-[#3A6640]/8 text-[#3A6640] border-[#3A6640]/25 hover:bg-[#3A6640] hover:text-white hover:border-[#3A6640] transition-colors"
-            >
-              {tag}
-            </Badge>
-          ))}
-        </div>
-      </div>
+      <ProjectCardBody
+        project={project}
+        titleClassName="text-xl font-bold"
+        bodyClassName="flex flex-col gap-5 p-5 sm:p-8 flex-1"
+        headerGapClassName="gap-4"
+        tagGapClassName="gap-2"
+      />
     </div>
   );
 }
 
 function SmallCard({ project, index }: { project: Project; index: number }) {
   const cover = PROJECT_COVERS[project.id];
+
   return (
     <div
       className={`reveal reveal-delay-${Math.min((index % 4) + 1, 4)} group flex flex-col rounded-xl border border-border bg-card overflow-hidden hover:border-[#3A6640]/40 hover:shadow-md hover:shadow-[#3A6640]/8 transition-all duration-300`}
     >
-      {/* Cover image */}
       {cover && (
         <div className="relative aspect-video overflow-hidden">
           <img
@@ -146,46 +115,86 @@ function SmallCard({ project, index }: { project: Project; index: number }) {
         </div>
       )}
 
-      <div className="flex flex-col gap-4 p-6">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-base font-semibold group-hover:text-[#3A6640] transition-colors text-left">
-            {project.title}
-          </h3>
-          <div className="flex gap-1 shrink-0">
-            {project.github && (
-              <a href={project.github} target="_blank" rel="noopener noreferrer">
-                <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-[#3A6640] hover:text-white transition-colors">
-                  <GithubIcon className="h-3.5 w-3.5" />
-                </Button>
-              </a>
-            )}
-            {project.live && (
-              <a href={project.live} target="_blank" rel="noopener noreferrer">
-                <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-[#3A6640] hover:text-white transition-colors">
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </Button>
-              </a>
-            )}
-          </div>
-        </div>
+      <ProjectCardBody
+        project={project}
+        titleClassName="text-base font-semibold"
+        bodyClassName="flex flex-col gap-4 p-6 flex-1"
+        headerGapClassName="gap-2"
+        tagGapClassName="gap-1.5"
+      />
+    </div>
+  );
+}
 
-        <p className="text-muted-foreground text-sm leading-relaxed text-left flex-1">
-          {project.description}
-        </p>
-
-        <div className="flex flex-wrap gap-1.5">
-          {project.tags.map((tag) => (
-            <Badge
-              key={tag}
-              variant="outline"
-              className="text-xs rounded-full bg-[#3A6640]/8 text-[#3A6640] border-[#3A6640]/25 hover:bg-[#3A6640] hover:text-white hover:border-[#3A6640] transition-colors"
-            >
-              {tag}
-            </Badge>
-          ))}
+function ProjectCardBody({
+  project,
+  titleClassName,
+  bodyClassName,
+  headerGapClassName,
+  tagGapClassName,
+}: {
+  project: Project;
+  titleClassName: string;
+  bodyClassName: string;
+  headerGapClassName: string;
+  tagGapClassName: string;
+}) {
+  return (
+    <div className={bodyClassName}>
+      <div className={`flex items-center justify-between ${headerGapClassName}`}>
+        <h3 className={`${titleClassName} group-hover:text-[#3A6640] transition-colors text-left`}>
+          {project.title}
+        </h3>
+        <div className="flex gap-1 shrink-0">
+          {project.github && (
+            <ProjectActionButton href={project.github}>
+              <GithubIcon className="h-4 w-4" />
+            </ProjectActionButton>
+          )}
+          {project.live && (
+            <ProjectActionButton href={project.live}>
+              <LinkIcon className="h-4 w-4" />
+            </ProjectActionButton>
+          )}
         </div>
+      </div>
+
+      <p className="text-muted-foreground text-sm leading-relaxed text-left flex-1">
+        {project.description}
+      </p>
+
+      <div className={`flex flex-wrap ${tagGapClassName}`}>
+        {project.tags.map((tag) => (
+          <Badge
+            key={tag}
+            variant="outline"
+            className="text-xs rounded-full bg-[#3A6640]/8 text-[#3A6640] border-[#3A6640]/25 hover:bg-[#3A6640] hover:text-white hover:border-[#3A6640] transition-colors"
+          >
+            {tag}
+          </Badge>
+        ))}
       </div>
     </div>
   );
 }
 
+function ProjectActionButton({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
+  return (
+    <Button
+      asChild
+      variant="ghost"
+      size="icon"
+      className="size-8 min-h-8 min-w-8 p-0 hover:bg-[#3A6640] hover:text-white transition-colors"
+    >
+      <a href={href} target="_blank" rel="noopener noreferrer" className="size-8">
+        {children}
+      </a>
+    </Button>
+  );
+}

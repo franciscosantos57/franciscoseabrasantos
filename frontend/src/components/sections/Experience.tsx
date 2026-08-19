@@ -6,12 +6,14 @@ import importrustSrc from "@/assets/importrust.jpg";
 import jeknowledgeSrc from "@/assets/jeknowledge.jpg";
 import neiSrc from "@/assets/nei.jpg";
 import deiSrc from "@/assets/dei.jpg";
+import ucSrc from "@/assets/uc.jpg";
 
 const COMPANY_ICONS: Record<number, string> = {
   1: importrustSrc,
   2: jeknowledgeSrc,
   3: neiSrc,
   4: deiSrc,
+  5: ucSrc,
 };
 
 export default function Experience() {
@@ -29,7 +31,9 @@ export default function Experience() {
             <img
               src={COMPANY_ICONS[item.id]}
               alt={item.company}
-              className="w-13 h-13 rounded-xl object-cover border border-[#3A6640]/20 shrink-0 shadow-sm"
+              className={`w-13 h-13 rounded-xl border border-[#3A6640]/20 shrink-0 shadow-sm ${
+                item.id === 5 ? "bg-white object-contain p-1.5" : "object-cover"
+              }`}
             />
           )}
 
@@ -87,6 +91,4 @@ export default function Experience() {
     </section>
   );
 }
-
-
 
