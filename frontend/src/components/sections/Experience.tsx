@@ -31,7 +31,7 @@ export default function Experience() {
             <img
               src={COMPANY_ICONS[item.id]}
               alt={item.company}
-              className={`w-13 h-13 rounded-xl border border-primary/20 shrink-0 shadow-sm ${
+              className={`w-11 h-11 md:w-13 md:h-13 rounded-xl border border-primary/20 shrink-0 shadow-sm ${
                 item.id === 5 ? "bg-white object-contain p-1.5" : "object-cover"
               }`}
             />
@@ -76,14 +76,14 @@ export default function Experience() {
       className="experience-bg bg-muted/50 overflow-hidden relative"
     >
       {/* Section header */}
-      <div className="max-w-4xl mx-auto px-5 pt-20 pb-10 md:px-6 md:pt-32 md:pb-4 reveal flex flex-col gap-3">
+      <div className="max-w-4xl mx-auto px-8 pt-20 pb-10 md:px-6 md:pt-32 md:pb-4 reveal flex flex-col gap-3">
         <p className="text-sm font-mono text-primary tracking-widest uppercase">
           career
         </p>
-        <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+        <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
           Experience
         </h2>
-        <p className="text-muted-foreground text-lg">My journey so far.</p>
+        <p className="text-muted-foreground text-base md:text-lg">My journey so far.</p>
       </div>
 
       {/* Curved SVG Timeline */}

@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <section
       id="home"
-      className="min-h-[100dvh] flex flex-col items-center justify-center relative px-6 pt-16"
+      className="min-h-[100svh] md:min-h-[100dvh] flex flex-col items-center justify-center relative px-8 md:px-6 pt-16"
       style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
     >
       {/* Background: interactive floating circles + corner glows + overlay */}
@@ -50,11 +50,11 @@ export default function Home() {
         <div className="home-bg-overlay absolute inset-0" />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center text-center max-w-2xl gap-6">
+      <div className="relative z-10 flex flex-col items-center text-center max-w-2xl gap-5 md:gap-6">
         {/* Avatar */}
         <div className="reveal relative group">
           <div className="absolute -inset-1.5 bg-linear-to-r from-primary to-primary/55 rounded-full blur-md opacity-40 group-hover:opacity-70 transition duration-500" />
-          <div className="relative w-44 h-44 rounded-full overflow-hidden border-2 border-primary/40 bg-muted flex items-center justify-center">
+          <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-2 border-primary/40 bg-muted flex items-center justify-center">
             <img
               src={photoSrc}
               alt={data.personal.name}
@@ -71,16 +71,16 @@ export default function Home() {
 
         {/* Name */}
         <div className="reveal reveal-delay-1 flex flex-col gap-2">
-          <h1 className="whitespace-nowrap text-[2rem] mobile-sm:text-2xl md:text-5xl font-bold tracking-tight">
+          <h1 className="whitespace-nowrap text-[1.75rem] mobile-sm:text-[1.55rem] md:text-5xl font-bold tracking-tight">
             <span className="theme-gradient-text">
               {data.personal.name}
             </span>
           </h1>
-          <p className="text-muted-foreground dark:text-white/80 text-lg font-medium">{data.personal.role}</p>
+          <p className="text-muted-foreground dark:text-white/80 text-base md:text-lg font-medium">{data.personal.role}</p>
         </div>
 
         {/* Description */}
-        <p className="reveal reveal-delay-2 text-muted-foreground dark:text-white/75 leading-relaxed text-base max-w-xl">
+        <p className="reveal reveal-delay-2 text-muted-foreground dark:text-white/75 leading-relaxed text-sm md:text-base max-w-xl">
           {data.personal.description}
         </p>
 
@@ -98,7 +98,7 @@ export default function Home() {
                   <Button
                     variant="outline"
                     size="icon"
-                    className="w-11 h-11 rounded-full border-border hover:scale-115 hover:shadow-lg hover:shadow-black/15 hover:border-foreground/35 dark:border-white/20 dark:hover:border-white/60 dark:hover:bg-white/10 dark:hover:shadow-white/15 transition-all duration-200"
+                    className="w-10 h-10 md:w-11 md:h-11 rounded-full border-border hover:scale-115 hover:shadow-lg hover:shadow-black/15 hover:border-foreground/35 dark:border-white/20 dark:hover:border-white/60 dark:hover:bg-white/10 dark:hover:shadow-white/15 transition-all duration-200"
                   >
                     <Icon className="h-5 w-5" />
                   </Button>
@@ -113,7 +113,7 @@ export default function Home() {
         <a className="reveal reveal-delay-4" href={data.personal.cv} download>
           <Button
             size="lg"
-            className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-0.5 px-8 py-3 text-base"
+            className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-0.5 px-6 py-2.5 md:px-8 md:py-3 text-sm md:text-base"
           >
             <Download className="h-4 w-4" />
             Download CV

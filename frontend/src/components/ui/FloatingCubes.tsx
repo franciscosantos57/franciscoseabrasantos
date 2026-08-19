@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 
 interface Shape {
+  nx: number;
+  ny: number;
   x: number;
   y: number;
   baseSize: number;
@@ -107,27 +109,49 @@ export function FloatingCubes() {
     if (!canvas) return;
     const ctx = canvas.getContext("2d")!;
     const canUsePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const shapeCount = isMobile ? 10 : 18;
 
     const initShapes = () => {
       const sign = () => (Math.random() < 0.5 ? 1 : -1);
-      shapesRef.current = Array.from({ length: 18 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        baseSize: 28 + Math.random() * 72,
-        phase: Math.random() * Math.PI * 2,
-        speed: 0.3 + Math.random() * 0.7,
-        baseOpacity: 0.045 + Math.random() * 0.09,
-        rotY: Math.random() * Math.PI * 2,
-        rotX: Math.random() * Math.PI * 2,
-        rotSpeedY: sign() * (0.18 + Math.random() * 0.32),
-        rotSpeedX: sign() * (0.08 + Math.random() * 0.16),
+      shapesRef.current = Array.from({ length: shapeCount }, () => {
+        const nx = Math.random();
+        const ny = Math.random();
+
+        return {
+          nx,
+          ny,
+          x: nx * canvas.width,
+          y: ny * canvas.height,
+          baseSize: isMobile ? 22 + Math.random() * 42 : 28 + Math.random() * 72,
+          phase: Math.random() * Math.PI * 2,
+          speed: isMobile ? 0.22 + Math.random() * 0.36 : 0.3 + Math.random() * 0.7,
+          baseOpacity: isMobile ? 0.035 + Math.random() * 0.055 : 0.045 + Math.random() * 0.09,
+          rotY: Math.random() * Math.PI * 2,
+          rotX: Math.random() * Math.PI * 2,
+          rotSpeedY: sign() * (0.18 + Math.random() * 0.32),
+          rotSpeedX: sign() * (0.08 + Math.random() * 0.16),
+        };
+      });
+    };
+
+    const syncShapePositions = () => {
+      shapesRef.current = shapesRef.current.map((shape) => ({
+        ...shape,
+        x: shape.nx * canvas.width,
+        y: shape.ny * canvas.height,
       }));
     };
 
     const resize = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
-      initShapes();
+
+      if (shapesRef.current.length !== shapeCount) {
+        initShapes();
+      } else {
+        syncShapePositions();
+      }
     };
 
     const draw = (t: number) => {
@@ -157,6 +181,16 @@ export function FloatingCubes() {
       rafRef.current = requestAnimationFrame(draw);
     };
 
+    const start = () => {
+      if (rafRef.current) return;
+      rafRef.current = requestAnimationFrame(draw);
+    };
+
+    const stop = () => {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    };
+
     resize();
     window.addEventListener("resize", resize);
 
@@ -175,10 +209,23 @@ export function FloatingCubes() {
       window.addEventListener("pointerleave", onLeave);
     }
 
-    rafRef.current = requestAnimationFrame(draw);
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          start();
+        } else {
+          stop();
+        }
+      },
+      { threshold: 0.05 },
+    );
+    visibilityObserver.observe(canvas);
+
+    start();
 
     return () => {
-      cancelAnimationFrame(rafRef.current);
+      stop();
+      visibilityObserver.disconnect();
       window.removeEventListener("resize", resize);
       if (canUsePointer) {
         window.removeEventListener("pointermove", onMove);

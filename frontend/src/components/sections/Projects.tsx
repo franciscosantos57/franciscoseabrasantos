@@ -33,17 +33,17 @@ export default function Projects() {
   return (
     <section
       id="projects"
-      className="py-20 px-5 md:py-32 md:px-6 relative overflow-hidden bg-background"
+      className="py-20 px-8 md:py-32 md:px-6 relative overflow-hidden bg-background"
     >
       <ProjectGridBackground />
-      <div className="relative z-10 max-w-4xl flex flex-col gap-16" style={{ marginInline: "auto" }}>
+      <div className="relative z-10 max-w-4xl flex flex-col gap-12 md:gap-16" style={{ marginInline: "auto" }}>
         <div className="reveal flex flex-col gap-3">
           <p className="text-sm font-mono text-primary tracking-widest uppercase">portfolio</p>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Projects</h2>
-          <p className="text-muted-foreground text-lg">Things I've built.</p>
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Projects</h2>
+          <p className="text-muted-foreground text-base md:text-lg">Things I've built.</p>
         </div>
 
-        <div className="flex flex-col gap-12">
+        <div className="flex flex-col gap-10 md:gap-12">
           {featured.length > 0 && (
             <div className="flex flex-col gap-6">
               {featured.map((project, i) => (
@@ -82,14 +82,13 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
             alt={project.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-0.5 bg-linear-to-b from-primary to-primary/60" />
         </div>
       )}
 
       <ProjectCardBody
         project={project}
-        titleClassName="text-xl font-bold"
-        bodyClassName="flex flex-col gap-5 p-5 sm:p-8 flex-1"
+        titleClassName="text-lg md:text-xl font-bold"
+        bodyClassName="flex flex-col gap-4 md:gap-5 p-5 sm:p-8 flex-1"
         headerGapClassName="gap-4"
         tagGapClassName="gap-2"
       />
@@ -118,7 +117,7 @@ function SmallCard({ project, index }: { project: Project; index: number }) {
       <ProjectCardBody
         project={project}
         titleClassName="text-base font-semibold"
-        bodyClassName="flex flex-col gap-4 p-6 flex-1"
+        bodyClassName="flex flex-col gap-4 p-5 md:p-6 flex-1"
         headerGapClassName="gap-2"
         tagGapClassName="gap-1.5"
       />

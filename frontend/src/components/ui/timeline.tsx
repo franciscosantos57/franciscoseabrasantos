@@ -268,7 +268,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-4xl px-4 pb-24 pt-14 md:pt-4"
+      className="relative w-full max-w-4xl px-8 pb-20 pt-10 md:px-4 md:pb-24 md:pt-4"
       style={{ marginInline: "auto" }}
     >
       {/* SVG absolute overlay — always behind cards */}
@@ -376,7 +376,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
       )}
 
       {/* Cards column — ref on the inner wrapper so x-translate doesn't pollute cy measurement */}
-      <div className="flex flex-col gap-28 sm:pt-0 pt-10 pb-10">
+      <div className="flex flex-col gap-20 sm:gap-28 sm:pt-0 pt-8 pb-8 md:pb-10">
         {data.map((item, i) => {
           const side: "left" | "right" = i % 2 === 0 ? "right" : "left";
           const justify = isMobile ? "justify-center" : side === "right" ? "justify-end" : "justify-start";

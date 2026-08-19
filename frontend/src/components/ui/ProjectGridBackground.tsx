@@ -166,11 +166,12 @@ export function ProjectGridBackground() {
 
     const resize = () => {
       const rect = section.getBoundingClientRect();
+      const isMobile = window.innerWidth < 768;
       width = rect.width;
       height = section.offsetHeight;
       cols = Math.ceil(width / CELL) + 2;
       rows = Math.ceil(height / CELL) + 2;
-      dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+      dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : MAX_DPR);
 
       canvas.width = Math.ceil(width * dpr);
       canvas.height = Math.ceil(height * dpr);
