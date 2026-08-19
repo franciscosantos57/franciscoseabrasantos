@@ -67,7 +67,7 @@ function getThemeRgb() {
     .split(/\s+/)
     .map(Number);
 
-  return value.length === 3 && value.every(Number.isFinite) ? value : [77, 155, 74];
+  return value.length === 3 && value.every(Number.isFinite) ? value : [0, 160, 129];
 }
 
 function drawPrism(
@@ -158,7 +158,7 @@ export function ProjectGridBackground() {
     let dpr = 1;
     let raf = 0;
     let running = true;
-    let startTime = 0;
+    const startTime = performance.now();
     let cols = 0;
     let rows = 0;
     let cells: GridCell[] = [];
@@ -211,7 +211,6 @@ export function ProjectGridBackground() {
     const start = () => {
       if (reducedMotion || raf) return;
       running = true;
-      startTime = performance.now();
       raf = requestAnimationFrame(render);
     };
 

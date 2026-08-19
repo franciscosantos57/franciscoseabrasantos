@@ -127,6 +127,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
   const [nodePositions, setNodePositions] = useState<NodePos[]>([]);
   const [activeNodes, setActiveNodes]     = useState<boolean[]>(new Array(n).fill(false));
   const [isMobile, setIsMobile]           = useState(() => typeof window !== 'undefined' && window.innerWidth < 640);
+  const [mobileTailCy, setMobileTailCy]   = useState<number | null>(null);
   const [weavingPhase, setWeavingPhase]   = useState(0);
   const [tipProgress, setTipProgress]     = useState(0);
 
@@ -162,7 +163,18 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
         }
         return { cx, cy, side: 'right' as const };
       });
+      const lastRect = rects[rects.length - 1];
+      const lastCardBottom = lastRect ? lastRect.bottom - cRect.top : h * 0.82;
+      const lastNodeTail = positions.length > 0
+        ? positions[positions.length - 1].cy + 240
+        : h * 0.9;
+      const desiredTailEnd = Math.max(
+        lastNodeTail,
+        lastCardBottom + 104,
+      );
+      const tailEnd = Math.min(h - 32, desiredTailEnd);
       setSvgDims({ w, h });
+      setMobileTailCy(tailEnd);
       setNodePositions(positions);
     } else {
       const positions: NodePos[] = cardRefs.current.map((ref, i) => {
@@ -174,6 +186,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
         return { cx, cy, side };
       });
       setSvgDims({ w, h });
+      setMobileTailCy(null);
       setNodePositions(positions);
     }
   }, [isMobile]);
@@ -216,11 +229,13 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
   const tipFadeStartY = Math.max(0, tipFadeEndY - FADE_ZONE_PX);
 
   // ── SVG path ────────────────────────────────────────────────────────────────
-  const tailCy     = nodePositions.length > 0
+  const tailCy     = isMobile && mobileTailCy !== null
+    ? mobileTailCy
+    : nodePositions.length > 0
     ? nodePositions[nodePositions.length - 1].cy + 240
     : svgDims.h * 0.9;
   const svgPath    = buildPath(nodePositions, tailCy);
-  const mobilePath = `M ${svgDims.w / 2} 0 L ${svgDims.w / 2} ${svgDims.h}`;
+  const mobilePath = `M ${svgDims.w / 2} 0 L ${svgDims.w / 2} ${tailCy}`;
   const activePath = isMobile ? mobilePath : svgPath;
   const viewBox    = `0 0 ${svgDims.w} ${svgDims.h}`;
 
@@ -236,17 +251,17 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
 
   const strand1d = nodePositions.length > 0
     ? (isMobile
-        ? `M ${svgDims.w / 2 - 9} 0 L ${svgDims.w / 2 - 9} ${svgDims.h}`
+        ? `M ${svgDims.w / 2 - 9} 0 L ${svgDims.w / 2 - 9} ${tailCy}`
         : buildWeavingPath(nodePositions, tailCy, weavingPhase, A, sphereCxs))
     : "";
   const strand2d = nodePositions.length > 0
     ? (isMobile
-        ? `M ${svgDims.w / 2} 0 L ${svgDims.w / 2} ${svgDims.h}`
+        ? `M ${svgDims.w / 2} 0 L ${svgDims.w / 2} ${tailCy}`
         : buildWeavingPath(nodePositions, tailCy, weavingPhase + Math.PI * 2 / 3, A, sphereCxs))
     : "";
   const strand3d = nodePositions.length > 0
     ? (isMobile
-        ? `M ${svgDims.w / 2 + 9} 0 L ${svgDims.w / 2 + 9} ${svgDims.h}`
+        ? `M ${svgDims.w / 2 + 9} 0 L ${svgDims.w / 2 + 9} ${tailCy}`
         : buildWeavingPath(nodePositions, tailCy, weavingPhase + Math.PI * 4 / 3, A, sphereCxs))
     : "";
 
@@ -269,21 +284,21 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
           <defs>
             {/* Strand 1 — lightest, drawn on top */}
             <linearGradient id="tlGrad1" gradientUnits="userSpaceOnUse"
-              x1={svgDims.w / 2} y1="0" x2={svgDims.w / 2} y2={isMobile ? svgDims.h : tailCy}>
+              x1={svgDims.w / 2} y1="0" x2={svgDims.w / 2} y2={tailCy}>
               <stop offset="0%"   stopColor={primarySoftOklch} />
               <stop offset="88%"  stopColor={primaryOklch} />
               <stop offset="100%" stopColor={primaryOklch} stopOpacity="0" />
             </linearGradient>
             {/* Strand 2 — mid tone */}
             <linearGradient id="tlGrad2" gradientUnits="userSpaceOnUse"
-              x1={svgDims.w / 2} y1="0" x2={svgDims.w / 2} y2={isMobile ? svgDims.h : tailCy}>
+              x1={svgDims.w / 2} y1="0" x2={svgDims.w / 2} y2={tailCy}>
               <stop offset="0%"   stopColor={primaryOklch} />
               <stop offset="88%"  stopColor={primaryDeepOklch} />
               <stop offset="100%" stopColor={primaryDeepOklch} stopOpacity="0" />
             </linearGradient>
             {/* Strand 3 — darkest, drawn behind */}
             <linearGradient id="tlGrad3" gradientUnits="userSpaceOnUse"
-              x1={svgDims.w / 2} y1="0" x2={svgDims.w / 2} y2={isMobile ? svgDims.h : tailCy}>
+              x1={svgDims.w / 2} y1="0" x2={svgDims.w / 2} y2={tailCy}>
               <stop offset="0%"   stopColor={primaryOklch} />
               <stop offset="88%"  stopColor={primaryDeepOklch} />
               <stop offset="100%" stopColor={primaryDeepOklch} stopOpacity="0" />

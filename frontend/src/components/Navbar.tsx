@@ -132,7 +132,7 @@ export default function Navbar({
         {/* Logo / Name */}
         <button
           onClick={() => handleNav("#home")}
-          className="font-bold text-lg tracking-tight transition-colors"
+          className="whitespace-nowrap font-bold text-lg tracking-tight transition-colors"
         >
           <span className="theme-gradient-text">
             Francisco
@@ -213,7 +213,7 @@ export default function Navbar({
           <div className="w-full px-4 h-16 flex items-center justify-between border-b border-border">
             <button
               onClick={() => handleNav("#home")}
-              className="font-bold text-lg tracking-tight"
+              className="whitespace-nowrap font-bold text-lg tracking-tight"
             >
               <span className="theme-gradient-text">Francisco</span>{" "}
               <span className="text-foreground">Santos</span>
@@ -241,27 +241,7 @@ export default function Navbar({
           </div>
 
           {/* Theme controls at bottom */}
-          <div className="pb-10 flex flex-col items-center gap-4">
-            <div className="flex flex-col items-center gap-3" data-theme-color-control>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setThemeOpen((open) => !open)}
-                className="text-muted-foreground hover:text-primary hover:bg-primary/8"
-                aria-label="Choose site colour"
-                aria-expanded={themeOpen}
-              >
-                <Palette className="h-4 w-4" />
-              </Button>
-              {themeOpen && (
-                <ThemeColorPanel
-                  hue={themeHue}
-                  onChange={onThemeHueChange}
-                  isAutoColor={isAutoColor}
-                  onToggleAutoColor={onToggleAutoColor}
-                />
-              )}
-            </div>
+          <div className="pb-10 flex justify-center">
             <button
               onClick={onToggleDark}
               className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/8 transition-all"

@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "portfolio-theme-hue-choice";
-const DEFAULT_HUE = 143;
+const DEFAULT_HUE = 175;
 const FULL_CYCLE_MS = 180000;
+const MOBILE_QUERY = "(max-width: 767px)";
+
+function isMobileViewport() {
+  return typeof window !== "undefined" && window.matchMedia(MOBILE_QUERY).matches;
+}
 
 function readStoredHue() {
   if (typeof window === "undefined") return null;
@@ -15,11 +20,20 @@ function readStoredHue() {
 }
 
 function readInitialState() {
+  if (isMobileViewport()) {
+    return {
+      hue: DEFAULT_HUE,
+      autoEnabled: true,
+      isMobile: true,
+    };
+  }
+
   const storedHue = readStoredHue();
 
   return {
     hue: storedHue ?? DEFAULT_HUE,
     autoEnabled: storedHue === null,
+    isMobile: false,
   };
 }
 
@@ -67,9 +81,33 @@ function applyThemeHue(hue: number) {
 
 export function useThemeColor() {
   const initialState = useRef(readInitialState());
+  const [isMobile, setIsMobile] = useState(initialState.current.isMobile);
   const [autoEnabled, setAutoEnabled] = useState(initialState.current.autoEnabled);
   const [hue, setHue] = useState(initialState.current.hue);
   const hueRef = useRef(initialState.current.hue);
+
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_QUERY);
+    const handleChange = () => {
+      const nextIsMobile = mq.matches;
+      setIsMobile(nextIsMobile);
+
+      if (nextIsMobile) {
+        setAutoEnabled(true);
+        if (readStoredHue() !== null) setHue(DEFAULT_HUE);
+        return;
+      }
+
+      const storedHue = readStoredHue();
+      if (storedHue !== null) {
+        setHue(storedHue);
+        setAutoEnabled(false);
+      }
+    };
+
+    mq.addEventListener("change", handleChange);
+    return () => mq.removeEventListener("change", handleChange);
+  }, []);
 
   useEffect(() => {
     hueRef.current = normalizeHue(hue);
@@ -102,15 +140,19 @@ export function useThemeColor() {
   }, [autoEnabled]);
 
   const chooseHue = useCallback((nextHue: number) => {
+    if (isMobile) return;
+
     const normalizedHue = normalizeHue(nextHue);
     hueRef.current = normalizedHue;
     setHue(normalizedHue);
     setAutoEnabled(false);
     applyThemeHue(normalizedHue);
     window.localStorage.setItem(STORAGE_KEY, String(normalizedHue));
-  }, []);
+  }, [isMobile]);
 
   const toggleAutoColor = useCallback(() => {
+    if (isMobile) return;
+
     setAutoEnabled((enabled) => {
       const nextEnabled = !enabled;
 
@@ -122,7 +164,7 @@ export function useThemeColor() {
 
       return nextEnabled;
     });
-  }, []);
+  }, [isMobile]);
 
   return {
     hue,

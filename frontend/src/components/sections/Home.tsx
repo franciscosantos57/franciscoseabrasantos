@@ -71,7 +71,7 @@ export default function Home() {
 
         {/* Name */}
         <div className="reveal reveal-delay-1 flex flex-col gap-2">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+          <h1 className="whitespace-nowrap text-[2rem] mobile-sm:text-2xl md:text-5xl font-bold tracking-tight">
             <span className="theme-gradient-text">
               {data.personal.name}
             </span>

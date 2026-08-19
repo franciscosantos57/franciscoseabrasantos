@@ -4,6 +4,36 @@
 @import "@fontsource-variable/geist";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant desktop-lg {
+  @media (max-width: 1440px) {
+    @slot;
+  }
+}
+@custom-variant desktop-md {
+  @media (max-width: 1280px) {
+    @slot;
+  }
+}
+@custom-variant desktop-sm {
+  @media (max-width: 1100px) {
+    @slot;
+  }
+}
+@custom-variant mobile-lg {
+  @media (max-width: 1024px) {
+    @slot;
+  }
+}
+@custom-variant mobile-md {
+  @media (max-width: 768px) {
+    @slot;
+  }
+}
+@custom-variant mobile-sm {
+  @media (max-width: 390px) {
+    @slot;
+  }
+}
 
 :root {
   font-synthesis: none;
@@ -12,8 +42,8 @@
   -moz-osx-font-smoothing: grayscale;
   --background: oklch(0.99 0.004 60);
   --foreground: oklch(0.14 0.015 40);
-  --theme-hue: 143;
-  --theme-rgb: 77 155 74;
+  --theme-hue: 175;
+  --theme-rgb: 0 160 129;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.14 0.015 40);
   --popover: oklch(1 0 0);
@@ -232,8 +262,8 @@ html.dark .experience-bg {
     -55deg,
     transparent,
     transparent 36px,
-    rgb(var(--theme-rgb) / 0.18) 36px,
-    rgb(var(--theme-rgb) / 0.18) 37px
+    rgb(var(--theme-rgb) / 0.07) 36px,
+    rgb(var(--theme-rgb) / 0.07) 37px
   );
 }
 
@@ -247,6 +277,8 @@ html.dark .home-bg-overlay {
 
 /* ── Projects section grid background ─────────────────────── */
 .project-grid-wrap {
+  right: 1px;
+  bottom: 1px;
   background:
     radial-gradient(circle at 16% 18%, rgb(var(--theme-rgb) / 0.045), transparent 32%),
     radial-gradient(circle at 82% 74%, rgb(var(--theme-rgb) / 0.035), transparent 34%);

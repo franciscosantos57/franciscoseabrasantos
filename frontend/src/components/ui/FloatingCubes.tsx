@@ -20,7 +20,7 @@ function getThemeRgb() {
     .split(/\s+/)
     .map(Number);
 
-  return value.length === 3 && value.every(Number.isFinite) ? value : [77, 155, 74];
+  return value.length === 3 && value.every(Number.isFinite) ? value : [0, 160, 129];
 }
 
 function drawCube(
@@ -106,6 +106,7 @@ export function FloatingCubes() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d")!;
+    const canUsePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
     const initShapes = () => {
       const sign = () => (Math.random() < 0.5 ? 1 : -1);
@@ -132,8 +133,8 @@ export function FloatingCubes() {
     const draw = (t: number) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const isDark = document.documentElement.classList.contains("dark");
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
+      const mx = canUsePointer ? mouseRef.current.x : -9999;
+      const my = canUsePointer ? mouseRef.current.y : -9999;
       const [baseR, baseG, baseB] = getThemeRgb();
 
       for (const s of shapesRef.current) {
@@ -169,16 +170,20 @@ export function FloatingCubes() {
       if (e.pointerType !== 'mouse') return;
       mouseRef.current = { x: -9999, y: -9999 };
     };
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerleave", onLeave);
+    if (canUsePointer) {
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerleave", onLeave);
+    }
 
     rafRef.current = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerleave", onLeave);
+      if (canUsePointer) {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerleave", onLeave);
+      }
     };
   }, []);
 
