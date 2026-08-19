@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <section
       id="home"
-      className="min-h-[100svh] md:min-h-[100dvh] flex flex-col items-center justify-center relative px-8 md:px-6 pt-16"
+      className="min-h-[100svh] md:min-h-[100dvh] flex flex-col items-center justify-center relative overflow-hidden px-8 md:px-6 pt-16"
       style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
     >
       {/* Background: interactive floating circles + corner glows + overlay */}
@@ -70,8 +70,8 @@ export default function Home() {
         </div>
 
         {/* Name */}
-        <div className="reveal reveal-delay-1 flex flex-col gap-2">
-          <h1 className="whitespace-nowrap text-[1.75rem] mobile-sm:text-[1.55rem] md:text-5xl font-bold tracking-tight">
+        <div className="reveal reveal-delay-1 flex w-full flex-col gap-2">
+          <h1 className="whitespace-nowrap text-[clamp(1.18rem,5.1vw,1.75rem)] md:text-5xl font-bold tracking-tight">
             <span className="theme-gradient-text">
               {data.personal.name}
             </span>

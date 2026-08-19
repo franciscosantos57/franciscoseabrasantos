@@ -115,6 +115,31 @@ function svgCubeFaces(
     }));
 }
 
+function MobileTimelineCube({ index }: { index: number }) {
+  const [phase, setPhase] = useState(index * 0.7);
+
+  useAnimationFrame((time) => {
+    setPhase(time * 0.0026 + index * 0.7);
+  });
+
+  const faces = svgCubeFaces(34, 34, 30, phase * 1.35, phase * 0.95 + index * 0.45);
+
+  return (
+    <svg viewBox="0 0 68 68" className="h-17 w-17" aria-hidden="true">
+      <circle cx="34" cy="34" r="30" fill="var(--background)" />
+      {faces.map(({ key: fk, points, shade }) => (
+        <polygon
+          key={fk}
+          points={points}
+          fill={`rgb(var(--theme-rgb) / ${(0.1 + shade * 0.52).toFixed(3)})`}
+          stroke={`rgb(var(--theme-rgb) / ${(0.38 + shade * 0.56).toFixed(3)})`}
+          strokeWidth="1"
+        />
+      ))}
+    </svg>
+  );
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
@@ -130,7 +155,6 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
   const [isMobile, setIsMobile]           = useState(() => typeof window !== 'undefined' && window.innerWidth < 640);
   const [mobileTailCy, setMobileTailCy]   = useState<number | null>(null);
   const [weavingPhase, setWeavingPhase]   = useState(0);
-  const [ambientPhase, setAmbientPhase]   = useState(0);
   const [tipProgress, setTipProgress]     = useState(0);
 
   useEffect(() => {
@@ -138,10 +162,6 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  useAnimationFrame((time) => {
-    if (isMobile) setAmbientPhase(time * 0.0026);
-  });
 
   // ── Measurement ─────────────────────────────────────────────────────────────
   const measure = useCallback(() => {
@@ -297,28 +317,13 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
         </div>
 
         <div className="relative z-10 flex flex-col gap-10">
-          {data.map((item, i) => {
-            const cubePhase = ambientPhase + i * 0.7;
-            const faces = svgCubeFaces(34, 34, 30, cubePhase * 1.35, cubePhase * 0.95 + i * 0.45);
-
-            return (
+          {data.map((item, i) => (
               <div
                 key={i}
                 className="flex flex-col gap-3"
               >
                 <div className="flex h-20 items-center justify-center">
-                  <svg viewBox="0 0 68 68" className="h-17 w-17" aria-hidden="true">
-                    <circle cx="34" cy="34" r="30" fill="var(--background)" />
-                    {faces.map(({ key: fk, points, shade }) => (
-                      <polygon
-                        key={fk}
-                        points={points}
-                        fill={`rgb(var(--theme-rgb) / ${(0.1 + shade * 0.52).toFixed(3)})`}
-                        stroke={`rgb(var(--theme-rgb) / ${(0.38 + shade * 0.56).toFixed(3)})`}
-                        strokeWidth="1"
-                      />
-                    ))}
-                  </svg>
+                  <MobileTimelineCube index={i} />
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -328,8 +333,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
                   {item.content}
                 </div>
               </div>
-            );
-          })}
+          ))}
         </div>
       </div>
     );
@@ -415,7 +419,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
             const scx = node.cx + (isMobile ? 0 : A * 0.15 * Math.sin(t_i + weavingPhase));
             const cy  = node.cy;
             // Both axes scroll-driven at different rates → natural tumble
-            const cubePhase = isMobile ? ambientPhase : weavingPhase;
+            const cubePhase = weavingPhase;
             const rotY = cubePhase * 1.35 + t_i * 0.8;
             const rotX = cubePhase * 0.95 + i * 0.45;
             const faces = svgCubeFaces(scx, cy, S, rotY, rotX);

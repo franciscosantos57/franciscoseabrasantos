@@ -1,4 +1,5 @@
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Home from "@/components/sections/Home";
 import Experience from "@/components/sections/Experience";
@@ -12,6 +13,21 @@ function App() {
   useScrollReveal();
   const { isDark, toggle } = useDarkMode();
   const { hue, setHue, isAutoColor, toggleAutoColor } = useThemeColor();
+
+  useEffect(() => {
+    const scrollToHash = () => {
+      const id = window.location.hash.slice(1);
+      if (!id) return;
+
+      requestAnimationFrame(() => {
+        document.getElementById(id)?.scrollIntoView({ block: "start" });
+      });
+    };
+
+    scrollToHash();
+    window.addEventListener("hashchange", scrollToHash);
+    return () => window.removeEventListener("hashchange", scrollToHash);
+  }, []);
 
   return (
     <TooltipProvider>

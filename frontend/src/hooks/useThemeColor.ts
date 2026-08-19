@@ -127,7 +127,7 @@ export function useThemeColor() {
       hueRef.current = normalizeHue(hueRef.current + (delta / FULL_CYCLE_MS) * 360);
       applyThemeHue(hueRef.current);
 
-      if (now - lastStateSync > 120) {
+      if (!isMobile && now - lastStateSync > 180) {
         setHue(hueRef.current);
         lastStateSync = now;
       }
@@ -137,7 +137,7 @@ export function useThemeColor() {
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [autoEnabled]);
+  }, [autoEnabled, isMobile]);
 
   const chooseHue = useCallback((nextHue: number) => {
     if (isMobile) return;
