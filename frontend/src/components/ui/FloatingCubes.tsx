@@ -110,9 +110,8 @@ export function FloatingCubes() {
     const ctx = canvas.getContext("2d")!;
     const canUsePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    const shapeCount = isMobile ? 14 : 18;
+    const shapeCount = isMobile ? 12 : 18;
     let canvasCssWidth = 0;
-    let canvasCssHeight = 0;
 
     const initShapes = () => {
       const sign = () => (Math.random() < 0.5 ? 1 : -1);
@@ -127,12 +126,12 @@ export function FloatingCubes() {
           y: ny * canvas.height,
           baseSize: isMobile ? 22 + Math.random() * 42 : 28 + Math.random() * 72,
           phase: Math.random() * Math.PI * 2,
-          speed: isMobile ? 1.1 + Math.random() * 0.95 : 0.3 + Math.random() * 0.7,
+          speed: isMobile ? 0.72 + Math.random() * 0.58 : 0.3 + Math.random() * 0.7,
           baseOpacity: isMobile ? 0.04 + Math.random() * 0.06 : 0.045 + Math.random() * 0.09,
           rotY: Math.random() * Math.PI * 2,
           rotX: Math.random() * Math.PI * 2,
-          rotSpeedY: sign() * (isMobile ? 0.9 + Math.random() * 0.8 : 0.18 + Math.random() * 0.32),
-          rotSpeedX: sign() * (isMobile ? 0.42 + Math.random() * 0.42 : 0.08 + Math.random() * 0.16),
+          rotSpeedY: sign() * (isMobile ? 0.52 + Math.random() * 0.45 : 0.18 + Math.random() * 0.32),
+          rotSpeedX: sign() * (isMobile ? 0.24 + Math.random() * 0.26 : 0.08 + Math.random() * 0.16),
         };
       });
     };
@@ -154,9 +153,8 @@ export function FloatingCubes() {
       }
 
       canvasCssWidth = nextWidth;
-      canvasCssHeight = nextHeight;
-      canvas.width = canvasCssWidth;
-      canvas.height = canvasCssHeight;
+      canvas.width = nextWidth;
+      canvas.height = nextHeight;
 
       if (shapesRef.current.length !== shapeCount) {
         initShapes();
@@ -192,16 +190,6 @@ export function FloatingCubes() {
       rafRef.current = requestAnimationFrame(draw);
     };
 
-    const start = () => {
-      if (rafRef.current) return;
-      rafRef.current = requestAnimationFrame(draw);
-    };
-
-    const stop = () => {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = 0;
-    };
-
     resize();
     window.addEventListener("resize", resize);
 
@@ -220,23 +208,11 @@ export function FloatingCubes() {
       window.addEventListener("pointerleave", onLeave);
     }
 
-    const visibilityObserver = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          start();
-        } else {
-          stop();
-        }
-      },
-      { threshold: 0.05 },
-    );
-    visibilityObserver.observe(canvas);
-
-    start();
+    draw(performance.now());
 
     return () => {
-      stop();
-      visibilityObserver.disconnect();
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
       window.removeEventListener("resize", resize);
       if (canUsePointer) {
         window.removeEventListener("pointermove", onMove);

@@ -140,7 +140,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
   }, []);
 
   useAnimationFrame((time) => {
-    if (isMobile) setAmbientPhase(time * 0.0042);
+    if (isMobile) setAmbientPhase(time * 0.0026);
   });
 
   // ── Measurement ─────────────────────────────────────────────────────────────
@@ -280,11 +280,20 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
       >
         <div
           aria-hidden="true"
-          className="absolute left-1/2 top-10 bottom-10 z-0 w-7 -translate-x-1/2"
+          className="absolute left-1/2 top-6 bottom-0 z-0 w-7 -translate-x-1/2"
         >
-          <div className="absolute left-1 top-0 bottom-0 w-0.5 rounded-full bg-linear-to-b from-primary/60 via-primary/45 to-transparent" />
-          <div className="absolute left-1/2 top-0 bottom-0 w-0.75 -translate-x-1/2 rounded-full bg-linear-to-b from-primary/80 via-primary/55 to-transparent" />
-          <div className="absolute right-1 top-0 bottom-0 w-0.5 rounded-full bg-linear-to-b from-primary/50 via-primary/35 to-transparent" />
+          <div
+            className="absolute left-1 top-0 bottom-0 w-0.5 rounded-full"
+            style={{ background: "linear-gradient(to bottom, rgb(var(--theme-rgb) / 0.6) 0%, rgb(var(--theme-rgb) / 0.45) 92%, rgb(var(--theme-rgb) / 0) 100%)" }}
+          />
+          <div
+            className="absolute left-1/2 top-0 bottom-0 w-0.75 -translate-x-1/2 rounded-full"
+            style={{ background: "linear-gradient(to bottom, rgb(var(--theme-rgb) / 0.8) 0%, rgb(var(--theme-rgb) / 0.55) 92%, rgb(var(--theme-rgb) / 0) 100%)" }}
+          />
+          <div
+            className="absolute right-1 top-0 bottom-0 w-0.5 rounded-full"
+            style={{ background: "linear-gradient(to bottom, rgb(var(--theme-rgb) / 0.5) 0%, rgb(var(--theme-rgb) / 0.35) 92%, rgb(var(--theme-rgb) / 0) 100%)" }}
+          />
         </div>
 
         <div className="relative z-10 flex flex-col gap-10">
@@ -293,13 +302,9 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
             const faces = svgCubeFaces(34, 34, 30, cubePhase * 1.35, cubePhase * 0.95 + i * 0.45);
 
             return (
-              <motion.div
+              <div
                 key={i}
                 className="flex flex-col gap-3"
-                initial={{ opacity: 0, y: 22 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-12% 0px -12% 0px" }}
-                transition={{ type: "spring", stiffness: 230, damping: 28, delay: 0.04 }}
               >
                 <div className="flex h-20 items-center justify-center">
                   <svg viewBox="0 0 68 68" className="h-17 w-17" aria-hidden="true">
@@ -322,7 +327,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
                   </p>
                   {item.content}
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>

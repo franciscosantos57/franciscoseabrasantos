@@ -27,17 +27,17 @@ const contactLinks = [
 
 export default function Contact() {
   return (
-    <section id="contact" className="min-h-[100dvh] px-8 py-20 md:px-6 md:py-24 bg-muted/50 flex items-center">
-      <div className="w-full max-w-4xl mx-auto flex flex-col gap-12 md:gap-16">
+    <section id="contact" className="min-h-[100svh] md:min-h-[100dvh] px-8 py-14 md:px-6 md:py-24 bg-muted/50 flex items-center">
+      <div className="w-full max-w-4xl mx-auto flex flex-col gap-8 md:gap-16">
         {/* Section header */}
-        <div className="reveal flex flex-col gap-3">
-          <p className="text-sm font-mono text-primary tracking-widest uppercase">get in touch</p>
+        <div className="reveal flex flex-col gap-2 md:gap-3">
+          <p className="text-xs md:text-sm font-mono text-primary tracking-widest uppercase">get in touch</p>
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Contact</h2>
-          <p className="text-muted-foreground text-base md:text-lg max-w-lg">{data.contact.message}</p>
+          <p className="text-muted-foreground text-sm md:text-lg max-w-lg">{data.contact.message}</p>
         </div>
 
         {/* Contact cards */}
-        <div className="grid sm:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-3 gap-3 md:gap-4">
           {contactLinks.map(({ label, value, href, icon: Icon, description }, i) => (
             <a
               key={label}
@@ -46,10 +46,10 @@ export default function Contact() {
               rel="noopener noreferrer"
               className={`reveal reveal-delay-${i + 1} block group`}
             >
-              <div className="bg-card border border-border rounded-xl md:rounded-2xl p-5 md:p-6 flex flex-col gap-4 md:gap-5 hover:border-primary/50 hover:shadow-md hover:shadow-primary/10 transition-all duration-300">
+              <div className="bg-card border border-border rounded-xl md:rounded-2xl p-4 md:p-6 flex flex-col gap-3 md:gap-5 hover:border-primary/50 hover:shadow-md hover:shadow-primary/10 transition-all duration-300">
                 <div className="flex items-start justify-between">
-                  <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                    <Icon className="h-5 w-5" />
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                    <Icon className="h-4 w-4 md:h-5 md:w-5" />
                   </div>
                   <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
@@ -65,12 +65,12 @@ export default function Contact() {
         </div>
 
         {/* Footer */}
-        <div className="reveal border-t border-border flex flex-col gap-1 text-center text-muted-foreground text-xs md:text-sm pt-7 md:pt-8">
+        <div className="reveal border-t border-border flex flex-col gap-1 text-center text-muted-foreground text-xs md:text-sm pt-5 md:pt-8">
           <p>
             Designed & built by{" "}
             <span className="text-foreground font-medium">Francisco Seabra Santos</span>
           </p>
-          <p className="text-xs">{new Date().getFullYear()} — All rights reserved</p>
+          <p className="text-xs">{new Date().getFullYear()} - All rights reserved</p>
         </div>
       </div>
     </section>
