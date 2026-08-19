@@ -5,6 +5,7 @@ import {
   useTransform,
   motion,
   useMotionValueEvent,
+  useAnimationFrame,
 } from "framer-motion";
 import React, { useRef, useState, useEffect, useCallback } from "react";
 
@@ -129,6 +130,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
   const [isMobile, setIsMobile]           = useState(() => typeof window !== 'undefined' && window.innerWidth < 640);
   const [mobileTailCy, setMobileTailCy]   = useState<number | null>(null);
   const [weavingPhase, setWeavingPhase]   = useState(0);
+  const [ambientPhase, setAmbientPhase]   = useState(0);
   const [tipProgress, setTipProgress]     = useState(0);
 
   useEffect(() => {
@@ -136,6 +138,10 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useAnimationFrame((time) => {
+    if (isMobile) setAmbientPhase(time * 0.0042);
+  });
 
   // ── Measurement ─────────────────────────────────────────────────────────────
   const measure = useCallback(() => {
@@ -265,6 +271,65 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
         : buildWeavingPath(nodePositions, tailCy, weavingPhase + Math.PI * 4 / 3, A, sphereCxs))
     : "";
 
+  if (isMobile) {
+    return (
+      <div
+        ref={containerRef}
+        className="relative w-full max-w-4xl px-8 pb-20 pt-10"
+        style={{ marginInline: "auto" }}
+      >
+        <div
+          aria-hidden="true"
+          className="absolute left-1/2 top-10 bottom-10 z-0 w-7 -translate-x-1/2"
+        >
+          <div className="absolute left-1 top-0 bottom-0 w-0.5 rounded-full bg-linear-to-b from-primary/60 via-primary/45 to-transparent" />
+          <div className="absolute left-1/2 top-0 bottom-0 w-0.75 -translate-x-1/2 rounded-full bg-linear-to-b from-primary/80 via-primary/55 to-transparent" />
+          <div className="absolute right-1 top-0 bottom-0 w-0.5 rounded-full bg-linear-to-b from-primary/50 via-primary/35 to-transparent" />
+        </div>
+
+        <div className="relative z-10 flex flex-col gap-10">
+          {data.map((item, i) => {
+            const cubePhase = ambientPhase + i * 0.7;
+            const faces = svgCubeFaces(34, 34, 30, cubePhase * 1.35, cubePhase * 0.95 + i * 0.45);
+
+            return (
+              <motion.div
+                key={i}
+                className="flex flex-col gap-3"
+                initial={{ opacity: 0, y: 22 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-12% 0px -12% 0px" }}
+                transition={{ type: "spring", stiffness: 230, damping: 28, delay: 0.04 }}
+              >
+                <div className="flex h-20 items-center justify-center">
+                  <svg viewBox="0 0 68 68" className="h-17 w-17" aria-hidden="true">
+                    <circle cx="34" cy="34" r="30" fill="var(--background)" />
+                    {faces.map(({ key: fk, points, shade }) => (
+                      <polygon
+                        key={fk}
+                        points={points}
+                        fill={`rgb(var(--theme-rgb) / ${(0.1 + shade * 0.52).toFixed(3)})`}
+                        stroke={`rgb(var(--theme-rgb) / ${(0.38 + shade * 0.56).toFixed(3)})`}
+                        strokeWidth="1"
+                      />
+                    ))}
+                  </svg>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <p className="text-left text-xs font-mono text-primary tracking-widest">
+                    {item.title}
+                  </p>
+                  {item.content}
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
@@ -340,13 +405,14 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
 
           {/* Nodes — rotating 3D cubes (same renderer as FloatingCubes) */}
           {nodePositions.map((node, i) => {
-            const S = 38;
+            const S = isMobile ? 30 : 38;
             const t_i = n > 1 ? (i / (n - 1)) * Math.PI * 3 : 0;
             const scx = node.cx + (isMobile ? 0 : A * 0.15 * Math.sin(t_i + weavingPhase));
             const cy  = node.cy;
             // Both axes scroll-driven at different rates → natural tumble
-            const rotY = weavingPhase * 1.2 + t_i * 0.8;
-            const rotX = weavingPhase * 0.7 + i * 0.45;
+            const cubePhase = isMobile ? ambientPhase : weavingPhase;
+            const rotY = cubePhase * 1.35 + t_i * 0.8;
+            const rotX = cubePhase * 0.95 + i * 0.45;
             const faces = svgCubeFaces(scx, cy, S, rotY, rotX);
             return (
               <motion.g
@@ -376,7 +442,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
       )}
 
       {/* Cards column — ref on the inner wrapper so x-translate doesn't pollute cy measurement */}
-      <div className="flex flex-col gap-20 sm:gap-28 sm:pt-0 pt-8 pb-8 md:pb-10">
+      <div className="flex flex-col gap-28 sm:pt-0 pb-10">
         {data.map((item, i) => {
           const side: "left" | "right" = i % 2 === 0 ? "right" : "left";
           const justify = isMobile ? "justify-center" : side === "right" ? "justify-end" : "justify-start";

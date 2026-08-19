@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Sun, Moon, Palette } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -156,21 +155,16 @@ export default function Navbar({
             </button>
           ))}
           <div className="relative ml-2" data-theme-color-control>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setThemeOpen((open) => !open)}
-                  className="text-muted-foreground dark:text-white/60 hover:text-primary hover:bg-primary/8 dark:hover:text-primary dark:hover:bg-white/10"
-                  aria-label="Choose site colour"
-                  aria-expanded={themeOpen}
-                >
-                  <Palette className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Site colour</TooltipContent>
-            </Tooltip>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setThemeOpen((open) => !open)}
+              className="text-muted-foreground dark:text-white/60 hover:text-primary hover:bg-primary/8 dark:hover:text-primary dark:hover:bg-white/10"
+              aria-label="Choose site colour"
+              aria-expanded={themeOpen}
+            >
+              <Palette className="h-4 w-4" />
+            </Button>
             {themeOpen && (
               <div className="absolute right-0 top-full mt-2">
                 <ThemeColorPanel

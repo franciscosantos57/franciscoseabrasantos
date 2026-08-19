@@ -110,7 +110,9 @@ export function FloatingCubes() {
     const ctx = canvas.getContext("2d")!;
     const canUsePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    const shapeCount = isMobile ? 10 : 18;
+    const shapeCount = isMobile ? 14 : 18;
+    let canvasCssWidth = 0;
+    let canvasCssHeight = 0;
 
     const initShapes = () => {
       const sign = () => (Math.random() < 0.5 ? 1 : -1);
@@ -125,12 +127,12 @@ export function FloatingCubes() {
           y: ny * canvas.height,
           baseSize: isMobile ? 22 + Math.random() * 42 : 28 + Math.random() * 72,
           phase: Math.random() * Math.PI * 2,
-          speed: isMobile ? 0.22 + Math.random() * 0.36 : 0.3 + Math.random() * 0.7,
-          baseOpacity: isMobile ? 0.035 + Math.random() * 0.055 : 0.045 + Math.random() * 0.09,
+          speed: isMobile ? 1.1 + Math.random() * 0.95 : 0.3 + Math.random() * 0.7,
+          baseOpacity: isMobile ? 0.04 + Math.random() * 0.06 : 0.045 + Math.random() * 0.09,
           rotY: Math.random() * Math.PI * 2,
           rotX: Math.random() * Math.PI * 2,
-          rotSpeedY: sign() * (0.18 + Math.random() * 0.32),
-          rotSpeedX: sign() * (0.08 + Math.random() * 0.16),
+          rotSpeedY: sign() * (isMobile ? 0.9 + Math.random() * 0.8 : 0.18 + Math.random() * 0.32),
+          rotSpeedX: sign() * (isMobile ? 0.42 + Math.random() * 0.42 : 0.08 + Math.random() * 0.16),
         };
       });
     };
@@ -144,8 +146,17 @@ export function FloatingCubes() {
     };
 
     const resize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
+      const nextWidth = canvas.offsetWidth;
+      const nextHeight = canvas.offsetHeight;
+
+      if (isMobile && canvasCssWidth && Math.abs(nextWidth - canvasCssWidth) < 2) {
+        return;
+      }
+
+      canvasCssWidth = nextWidth;
+      canvasCssHeight = nextHeight;
+      canvas.width = canvasCssWidth;
+      canvas.height = canvasCssHeight;
 
       if (shapesRef.current.length !== shapeCount) {
         initShapes();
