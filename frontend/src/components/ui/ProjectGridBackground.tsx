@@ -60,6 +60,16 @@ function createCells(cols: number, rows: number) {
   });
 }
 
+function getThemeRgb() {
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue("--theme-rgb")
+    .trim()
+    .split(/\s+/)
+    .map(Number);
+
+  return value.length === 3 && value.every(Number.isFinite) ? value : [77, 155, 74];
+}
+
 function drawPrism(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -67,6 +77,7 @@ function drawPrism(
   lift: number,
   intensity: number,
   isDark: boolean,
+  themeRgb: number[],
 ) {
   const inset = 1;
   const size = CELL - 2;
@@ -85,11 +96,18 @@ function drawPrism(
   const raisedTop = top + raiseY;
   const raisedRight = right + raiseX;
   const raisedBottom = bottom + raiseY;
+  const [r, g, b] = themeRgb;
+  const sideR = Math.max(0, r - 58);
+  const sideG = Math.max(0, g - 72);
+  const sideB = Math.max(0, b - 62);
+  const edgeR = isDark ? Math.min(255, r + 30) : r;
+  const edgeG = isDark ? Math.min(255, g + 24) : g;
+  const edgeB = isDark ? Math.min(255, b + 30) : b;
 
   if (lift > 0.35) {
     ctx.fillStyle = isDark
-      ? `rgba(49,98,58,${sideAlpha * 0.66})`
-      : `rgba(24,60,34,${sideAlpha * 0.58})`;
+      ? `rgba(${sideR},${sideG},${sideB},${sideAlpha * 0.66})`
+      : `rgba(${sideR},${sideG},${sideB},${sideAlpha * 0.58})`;
     ctx.beginPath();
     ctx.moveTo(raisedLeft, raisedBottom);
     ctx.lineTo(raisedRight, raisedBottom);
@@ -99,8 +117,8 @@ function drawPrism(
     ctx.fill();
 
     ctx.fillStyle = isDark
-      ? `rgba(74,132,82,${sideAlpha * 0.78})`
-      : `rgba(36,78,44,${sideAlpha * 0.7})`;
+      ? `rgba(${Math.min(255, sideR + 26)},${Math.min(255, sideG + 34)},${Math.min(255, sideB + 26)},${sideAlpha * 0.78})`
+      : `rgba(${Math.min(255, sideR + 12)},${Math.min(255, sideG + 18)},${Math.min(255, sideB + 12)},${sideAlpha * 0.7})`;
     ctx.beginPath();
     ctx.moveTo(raisedRight, raisedTop);
     ctx.lineTo(right, top);
@@ -110,11 +128,7 @@ function drawPrism(
     ctx.fill();
   }
 
-  const topFill = isDark
-    ? `rgba(123,196,127,${topAlpha})`
-    : `rgba(58,102,64,${topAlpha})`;
-
-  ctx.fillStyle = topFill;
+  ctx.fillStyle = `rgba(${r},${g},${b},${topAlpha})`;
   ctx.fillRect(raisedLeft, raisedTop, size, size);
 
   ctx.fillStyle = isDark
@@ -124,8 +138,8 @@ function drawPrism(
   ctx.fillRect(raisedLeft + 1, raisedTop + 1, 1, size - 2);
 
   ctx.strokeStyle = isDark
-    ? `rgba(155,220,160,${edgeAlpha})`
-    : `rgba(58,102,64,${edgeAlpha})`;
+    ? `rgba(${edgeR},${edgeG},${edgeB},${edgeAlpha})`
+    : `rgba(${edgeR},${edgeG},${edgeB},${edgeAlpha})`;
   ctx.lineWidth = 1;
   ctx.strokeRect(raisedLeft + 0.5, raisedTop + 0.5, size - 1, size - 1);
 }
@@ -171,6 +185,7 @@ export function ProjectGridBackground() {
       if (!running) return;
 
       const isDark = document.documentElement.classList.contains("dark");
+      const themeRgb = getThemeRgb();
       const progress = reducedMotion ? 0.48 : ((now - startTime) % DURATION) / DURATION;
       const diagonalReach = height * DIAGONAL_SLOPE;
       const loopLength = Math.max(1, width + diagonalReach);
@@ -185,7 +200,7 @@ export function ProjectGridBackground() {
 
         const liftIntensity = Math.pow(intensity, 1.02);
         const colorIntensity = Math.pow(intensity, 1.18);
-        drawPrism(ctx, cell.x, cell.y, liftIntensity * MAX_LIFT, colorIntensity, isDark);
+        drawPrism(ctx, cell.x, cell.y, liftIntensity * MAX_LIFT, colorIntensity, isDark, themeRgb);
       });
 
       if (!reducedMotion) {

@@ -21,17 +21,17 @@ export default function Experience() {
     // title is rendered as the period label above each card
     title: item.period,
     content: (
-      <div className="w-full bg-card border border-[#3A6640]/15 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:border-[#3A6640]/30 transition-all duration-300">
+      <div className="w-full bg-card border border-primary/15 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300">
         {/* Card header */}
-        <div className="relative flex items-center gap-3 px-4 pt-4 pb-3.5 bg-linear-to-br from-[#3A6640]/10 via-[#3A6640]/5 to-transparent border-b border-[#3A6640]/10">
+        <div className="relative flex items-center gap-3 px-4 pt-4 pb-3.5 bg-linear-to-br from-primary/10 via-primary/5 to-transparent border-b border-primary/10">
           {/* Left accent bar */}
-          <div className="absolute left-0 top-0 h-full w-0.75 bg-linear-to-b from-[#7BC47F] via-[#3A6640] to-[#2C5432] rounded-l-2xl" />
+          <div className="absolute left-0 top-0 h-full w-0.75 bg-linear-to-b from-primary/55 via-primary to-primary/75 rounded-l-2xl" />
 
           {COMPANY_ICONS[item.id] && (
             <img
               src={COMPANY_ICONS[item.id]}
               alt={item.company}
-              className={`w-13 h-13 rounded-xl border border-[#3A6640]/20 shrink-0 shadow-sm ${
+              className={`w-13 h-13 rounded-xl border border-primary/20 shrink-0 shadow-sm ${
                 item.id === 5 ? "bg-white object-contain p-1.5" : "object-cover"
               }`}
             />
@@ -41,7 +41,7 @@ export default function Experience() {
             <h3 className="font-bold text-sm leading-tight text-foreground dark:text-white">
               {item.title}
             </h3>
-            <p className="text-[13px] font-semibold text-[#3A6640] mt-0.5">{item.company}</p>
+            <p className="text-[13px] font-semibold text-primary mt-0.5">{item.company}</p>
             <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground dark:text-white/55 mt-0.5">
               <MapPin className="h-3 w-3 shrink-0" />
               {item.location}
@@ -59,7 +59,7 @@ export default function Experience() {
               <Badge
                 key={tag}
                 variant="outline"
-                className="text-[10px] px-2 py-0.5 rounded-full bg-[#3A6640]/8 text-[#3A6640] border-[#3A6640]/25 hover:bg-[#3A6640] hover:text-white hover:border-[#3A6640] transition-colors"
+                className="text-[10px] px-2 py-0.5 rounded-full bg-primary/8 text-primary border-primary/25 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
               >
                 {tag}
               </Badge>
@@ -77,7 +77,7 @@ export default function Experience() {
     >
       {/* Section header */}
       <div className="max-w-4xl mx-auto px-5 pt-20 pb-10 md:px-6 md:pt-32 md:pb-4 reveal flex flex-col gap-3">
-        <p className="text-sm font-mono text-[#3A6640] tracking-widest uppercase">
+        <p className="text-sm font-mono text-primary tracking-widest uppercase">
           career
         </p>
         <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
@@ -91,4 +91,3 @@ export default function Experience() {
     </section>
   );
 }
-

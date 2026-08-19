@@ -38,7 +38,7 @@ export default function Projects() {
       <ProjectGridBackground />
       <div className="relative z-10 max-w-4xl flex flex-col gap-16" style={{ marginInline: "auto" }}>
         <div className="reveal flex flex-col gap-3">
-          <p className="text-sm font-mono text-[#3A6640] tracking-widest uppercase">portfolio</p>
+          <p className="text-sm font-mono text-primary tracking-widest uppercase">portfolio</p>
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Projects</h2>
           <p className="text-muted-foreground text-lg">Things I've built.</p>
         </div>
@@ -73,7 +73,7 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
 
   return (
     <div
-      className={`reveal reveal-delay-${Math.min(index + 1, 4)} group flex flex-col sm:flex-row rounded-2xl border border-border bg-card overflow-hidden hover:border-[#3A6640]/40 hover:shadow-xl hover:shadow-[#3A6640]/10 transition-all duration-300`}
+      className={`reveal reveal-delay-${Math.min(index + 1, 4)} group flex flex-col sm:flex-row rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300`}
     >
       {cover && (
         <div className="relative w-full aspect-video sm:w-2/5 sm:aspect-auto shrink-0 overflow-hidden">
@@ -82,7 +82,7 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
             alt={project.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-0.5 bg-linear-to-b from-[#3A6640] to-[#5A9660]" />
+          <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-0.5 bg-linear-to-b from-primary to-primary/60" />
         </div>
       )}
 
@@ -102,7 +102,7 @@ function SmallCard({ project, index }: { project: Project; index: number }) {
 
   return (
     <div
-      className={`reveal reveal-delay-${Math.min((index % 4) + 1, 4)} group flex flex-col rounded-xl border border-border bg-card overflow-hidden hover:border-[#3A6640]/40 hover:shadow-md hover:shadow-[#3A6640]/8 transition-all duration-300`}
+      className={`reveal reveal-delay-${Math.min((index % 4) + 1, 4)} group flex flex-col rounded-xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-md hover:shadow-primary/8 transition-all duration-300`}
     >
       {cover && (
         <div className="relative aspect-video overflow-hidden">
@@ -142,7 +142,7 @@ function ProjectCardBody({
   return (
     <div className={bodyClassName}>
       <div className={`flex items-center justify-between ${headerGapClassName}`}>
-        <h3 className={`${titleClassName} group-hover:text-[#3A6640] transition-colors text-left`}>
+        <h3 className={`${titleClassName} group-hover:text-primary transition-colors text-left`}>
           {project.title}
         </h3>
         <div className="flex gap-1 shrink-0">
@@ -168,7 +168,7 @@ function ProjectCardBody({
           <Badge
             key={tag}
             variant="outline"
-            className="text-xs rounded-full bg-[#3A6640]/8 text-[#3A6640] border-[#3A6640]/25 hover:bg-[#3A6640] hover:text-white hover:border-[#3A6640] transition-colors"
+            className="text-xs rounded-full bg-primary/8 text-primary border-primary/25 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
           >
             {tag}
           </Badge>
@@ -190,7 +190,7 @@ function ProjectActionButton({
       asChild
       variant="ghost"
       size="icon"
-      className="size-8 min-h-8 min-w-8 p-0 hover:bg-[#3A6640] hover:text-white transition-colors"
+      className="size-8 min-h-8 min-w-8 p-0 hover:bg-primary hover:text-primary-foreground transition-colors"
     >
       <a href={href} target="_blank" rel="noopener noreferrer" className="size-8">
         {children}

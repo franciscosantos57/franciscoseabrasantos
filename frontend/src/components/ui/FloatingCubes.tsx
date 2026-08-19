@@ -13,6 +13,16 @@ interface Shape {
   rotSpeedX: number;
 }
 
+function getThemeRgb() {
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue("--theme-rgb")
+    .trim()
+    .split(/\s+/)
+    .map(Number);
+
+  return value.length === 3 && value.every(Number.isFinite) ? value : [77, 155, 74];
+}
+
 function drawCube(
   ctx: CanvasRenderingContext2D,
   cx: number,
@@ -124,9 +134,7 @@ export function FloatingCubes() {
       const isDark = document.documentElement.classList.contains("dark");
       const mx = mouseRef.current.x;
       const my = mouseRef.current.y;
-      const cr = isDark ? 100 : 58;
-      const cg = isDark ? 170 : 102;
-      const cb = isDark ? 110 : 64;
+      const [baseR, baseG, baseB] = getThemeRgb();
 
       for (const s of shapesRef.current) {
         const breath = Math.sin(t * 0.001 * s.speed + s.phase);
@@ -142,7 +150,7 @@ export function FloatingCubes() {
 
         const rotY = s.rotY + t * 0.001 * s.rotSpeedY;
         const rotX = s.rotX + t * 0.001 * s.rotSpeedX;
-        drawCube(ctx, s.x, s.y, sizeFinal, rotY, rotX, cr, cg, cb, baseOp);
+        drawCube(ctx, s.x, s.y, sizeFinal, rotY, rotX, baseR, baseG, baseB, baseOp);
       }
 
       rafRef.current = requestAnimationFrame(draw);

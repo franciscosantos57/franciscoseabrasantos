@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, Palette } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -12,12 +13,87 @@ const navLinks = [
 interface NavbarProps {
   isDark: boolean;
   onToggleDark: () => void;
+  themeHue: number;
+  onThemeHueChange: (hue: number) => void;
+  isAutoColor: boolean;
+  onToggleAutoColor: () => void;
 }
 
-export default function Navbar({ isDark, onToggleDark }: NavbarProps) {
+function ThemeColorPanel({
+  hue,
+  onChange,
+  isAutoColor,
+  onToggleAutoColor,
+}: {
+  hue: number;
+  onChange: (hue: number) => void;
+  isAutoColor: boolean;
+  onToggleAutoColor: () => void;
+}) {
+  return (
+    <div className="flex w-52 flex-col gap-2 rounded-lg border border-border bg-background/95 p-3 shadow-lg shadow-black/10 backdrop-blur-md dark:shadow-black/25">
+      <div className="flex items-center gap-2">
+        <input
+          type="range"
+          min="0"
+          max="360"
+          value={hue}
+          onChange={(event) => onChange(Number(event.target.value))}
+          className="theme-hue-slider min-w-0 flex-1"
+          aria-label="Choose site colour"
+        />
+        <span
+          className="h-4 w-4 shrink-0 rounded-full border border-border shadow-inner"
+          style={{ backgroundColor: `oklch(0.58 0.14 ${hue})` }}
+          aria-hidden="true"
+        />
+      </div>
+      <button
+        type="button"
+        onClick={onToggleAutoColor}
+        className="w-full rounded-md bg-muted/50 px-3 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-primary/8 hover:text-primary"
+        aria-pressed={isAutoColor}
+      >
+        {isAutoColor ? "Disable Auto" : "Enable Auto"}
+      </button>
+    </div>
+  );
+}
+
+export default function Navbar({
+  isDark,
+  onToggleDark,
+  themeHue,
+  onThemeHueChange,
+  isAutoColor,
+  onToggleAutoColor,
+}: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [themeOpen, setThemeOpen] = useState(false);
   const [active, setActive] = useState("home");
+
+  useEffect(() => {
+    if (!themeOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("[data-theme-color-control]")) return;
+      setThemeOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setThemeOpen(false);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [themeOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,6 +114,7 @@ export default function Navbar({ isDark, onToggleDark }: NavbarProps) {
 
   const handleNav = (href: string) => {
     setMenuOpen(false);
+    setThemeOpen(false);
     const id = href.replace("#", "");
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
@@ -57,7 +134,7 @@ export default function Navbar({ isDark, onToggleDark }: NavbarProps) {
           onClick={() => handleNav("#home")}
           className="font-bold text-lg tracking-tight transition-colors"
         >
-          <span className="bg-linear-to-r from-[#3A6640] to-[#5A9660] bg-clip-text text-transparent">
+          <span className="theme-gradient-text">
             Francisco
           </span>{" "}
           <span className="text-foreground">Santos</span>
@@ -71,18 +148,45 @@ export default function Navbar({ isDark, onToggleDark }: NavbarProps) {
               onClick={() => handleNav(href)}
               className={`px-4 py-2 text-sm font-medium transition-all duration-200 rounded-lg ${
                 active === href.replace("#", "")
-                  ? "text-[#3A6640] dark:text-white font-semibold"
-                  : "text-foreground/60 dark:text-white/75 hover:text-[#3A6640] hover:bg-[#3A6640]/8 dark:hover:text-white dark:hover:bg-white/10"
+                  ? "text-primary font-semibold"
+                  : "text-foreground/60 dark:text-white/75 hover:text-primary hover:bg-primary/8 dark:hover:text-primary dark:hover:bg-white/10"
               }`}
             >
               {label}
             </button>
           ))}
+          <div className="relative ml-2" data-theme-color-control>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setThemeOpen((open) => !open)}
+                  className="text-muted-foreground dark:text-white/60 hover:text-primary hover:bg-primary/8 dark:hover:text-primary dark:hover:bg-white/10"
+                  aria-label="Choose site colour"
+                  aria-expanded={themeOpen}
+                >
+                  <Palette className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Site colour</TooltipContent>
+            </Tooltip>
+            {themeOpen && (
+              <div className="absolute right-0 top-full mt-2">
+                <ThemeColorPanel
+                  hue={themeHue}
+                  onChange={onThemeHueChange}
+                  isAutoColor={isAutoColor}
+                  onToggleAutoColor={onToggleAutoColor}
+                />
+              </div>
+            )}
+          </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={onToggleDark}
-            className="ml-1 text-muted-foreground dark:text-white/60 hover:text-[#3A6640] hover:bg-[#3A6640]/8 dark:hover:text-white dark:hover:bg-white/10"
+            className="ml-1 text-muted-foreground dark:text-white/60 hover:text-primary hover:bg-primary/8 dark:hover:text-primary dark:hover:bg-white/10"
             aria-label="Toggle dark mode"
           >
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -93,7 +197,7 @@ export default function Navbar({ isDark, onToggleDark }: NavbarProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden text-muted-foreground hover:text-[#3A6640]"
+          className="md:hidden text-muted-foreground hover:text-primary"
           onClick={() => setMenuOpen((o) => !o)}
           aria-label="Toggle menu"
         >
@@ -111,7 +215,7 @@ export default function Navbar({ isDark, onToggleDark }: NavbarProps) {
               onClick={() => handleNav("#home")}
               className="font-bold text-lg tracking-tight"
             >
-              <span className="bg-linear-to-r from-[#3A6640] to-[#5A9660] bg-clip-text text-transparent">Francisco</span>{" "}
+              <span className="theme-gradient-text">Francisco</span>{" "}
               <span className="text-foreground">Santos</span>
             </button>
             <Button variant="ghost" size="icon" onClick={() => setMenuOpen(false)} aria-label="Close menu">
@@ -127,8 +231,8 @@ export default function Navbar({ isDark, onToggleDark }: NavbarProps) {
                 onClick={() => handleNav(href)}
                 className={`w-full max-w-xs text-center px-6 py-4 rounded-xl text-lg font-medium transition-all ${
                   active === href.replace("#", "")
-                    ? "text-[#3A6640] font-semibold bg-[#3A6640]/8"
-                    : "text-foreground/60 hover:text-[#3A6640] hover:bg-[#3A6640]/8"
+                    ? "text-primary font-semibold bg-primary/8"
+                    : "text-foreground/60 hover:text-primary hover:bg-primary/8"
                 }`}
               >
                 {label}
@@ -136,11 +240,31 @@ export default function Navbar({ isDark, onToggleDark }: NavbarProps) {
             ))}
           </div>
 
-          {/* Dark mode toggle at bottom */}
-          <div className="pb-10 flex justify-center">
+          {/* Theme controls at bottom */}
+          <div className="pb-10 flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-3" data-theme-color-control>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setThemeOpen((open) => !open)}
+                className="text-muted-foreground hover:text-primary hover:bg-primary/8"
+                aria-label="Choose site colour"
+                aria-expanded={themeOpen}
+              >
+                <Palette className="h-4 w-4" />
+              </Button>
+              {themeOpen && (
+                <ThemeColorPanel
+                  hue={themeHue}
+                  onChange={onThemeHueChange}
+                  isAutoColor={isAutoColor}
+                  onToggleAutoColor={onToggleAutoColor}
+                />
+              )}
+            </div>
             <button
               onClick={onToggleDark}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-[#3A6640] hover:bg-[#3A6640]/8 transition-all"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/8 transition-all"
             >
               {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               {isDark ? "Light mode" : "Dark mode"}

@@ -31,7 +31,7 @@ export default function Contact() {
       <div className="max-w-4xl mx-auto flex flex-col gap-16">
         {/* Section header */}
         <div className="reveal flex flex-col gap-3">
-          <p className="text-sm font-mono text-[#3A6640] tracking-widest uppercase">get in touch</p>
+          <p className="text-sm font-mono text-primary tracking-widest uppercase">get in touch</p>
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Contact</h2>
           <p className="text-muted-foreground text-lg max-w-lg">{data.contact.message}</p>
         </div>
@@ -46,12 +46,12 @@ export default function Contact() {
               rel="noopener noreferrer"
               className={`reveal reveal-delay-${i + 1} block group`}
             >
-              <div className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-5 hover:border-[#3A6640]/50 hover:shadow-md hover:shadow-[#3A6640]/10 transition-all duration-300">
+              <div className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-5 hover:border-primary/50 hover:shadow-md hover:shadow-primary/10 transition-all duration-300">
                 <div className="flex items-start justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-[#3A6640]/10 border border-[#3A6640]/20 flex items-center justify-center text-[#3A6640]">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-[#3A6640] transition-colors" />
+                  <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
 
                 <div className="flex flex-col gap-1 text-left">
@@ -76,4 +76,3 @@ export default function Contact() {
     </section>
   );
 }
-

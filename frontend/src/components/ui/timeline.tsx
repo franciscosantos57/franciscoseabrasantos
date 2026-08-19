@@ -13,6 +13,10 @@ export interface TimelineEntry {
   content: React.ReactNode;
 }
 
+const primaryOklch = "oklch(0.62 0.14 var(--theme-hue))";
+const primaryDeepOklch = "oklch(0.42 0.12 var(--theme-hue))";
+const primarySoftOklch = "oklch(0.74 0.12 var(--theme-hue))";
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function buildThresholds(n: number) {
@@ -266,23 +270,23 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
             {/* Strand 1 — lightest, drawn on top */}
             <linearGradient id="tlGrad1" gradientUnits="userSpaceOnUse"
               x1={svgDims.w / 2} y1="0" x2={svgDims.w / 2} y2={isMobile ? svgDims.h : tailCy}>
-              <stop offset="0%"   stopColor="#6BBF72" />
-              <stop offset="88%"  stopColor="#3A6640" />
-              <stop offset="100%" stopColor="#3A6640" stopOpacity="0" />
+              <stop offset="0%"   stopColor={primarySoftOklch} />
+              <stop offset="88%"  stopColor={primaryOklch} />
+              <stop offset="100%" stopColor={primaryOklch} stopOpacity="0" />
             </linearGradient>
             {/* Strand 2 — mid tone */}
             <linearGradient id="tlGrad2" gradientUnits="userSpaceOnUse"
               x1={svgDims.w / 2} y1="0" x2={svgDims.w / 2} y2={isMobile ? svgDims.h : tailCy}>
-              <stop offset="0%"   stopColor="#5A9660" />
-              <stop offset="88%"  stopColor="#3A6640" />
-              <stop offset="100%" stopColor="#3A6640" stopOpacity="0" />
+              <stop offset="0%"   stopColor={primaryOklch} />
+              <stop offset="88%"  stopColor={primaryDeepOklch} />
+              <stop offset="100%" stopColor={primaryDeepOklch} stopOpacity="0" />
             </linearGradient>
             {/* Strand 3 — darkest, drawn behind */}
             <linearGradient id="tlGrad3" gradientUnits="userSpaceOnUse"
               x1={svgDims.w / 2} y1="0" x2={svgDims.w / 2} y2={isMobile ? svgDims.h : tailCy}>
-              <stop offset="0%"   stopColor="#4A8050" />
-              <stop offset="88%"  stopColor="#2E5234" />
-              <stop offset="100%" stopColor="#2E5234" stopOpacity="0" />
+              <stop offset="0%"   stopColor={primaryOklch} />
+              <stop offset="88%"  stopColor={primaryDeepOklch} />
+              <stop offset="100%" stopColor={primaryDeepOklch} stopOpacity="0" />
             </linearGradient>
 
             {/* Tip fade: gradient mask so the animated leading edge fades to transparent */}
@@ -345,8 +349,8 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
                   <polygon
                     key={fk}
                     points={points}
-                    fill={`rgba(90,150,96,${(0.08 + shade * 0.50).toFixed(3)})`}
-                    stroke={`rgba(107,191,114,${(0.35 + shade * 0.55).toFixed(3)})`}
+                    fill={`rgb(var(--theme-rgb) / ${(0.08 + shade * 0.50).toFixed(3)})`}
+                    stroke={`rgb(var(--theme-rgb) / ${(0.35 + shade * 0.55).toFixed(3)})`}
                     strokeWidth="1"
                   />
                 ))}
@@ -378,7 +382,7 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
                 ref={(el) => { cardRefs.current[i] = el; }}
                 className={`${isMobile ? "w-full" : "w-[38%]"} flex flex-col gap-2`}
               >
-                <p className={`text-xs font-mono text-[#3A6640] tracking-widest ${
+                <p className={`text-xs font-mono text-primary tracking-widest ${
                   side === "left" ? "text-right" : "text-left"
                 }`}>
                   {item.title}
@@ -395,4 +399,3 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
 
 export const Timeline = ({ data }: { data: TimelineEntry[]; hideHeader?: boolean }) =>
   <CurvedTimeline data={data} />;
-
