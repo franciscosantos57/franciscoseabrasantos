@@ -29,8 +29,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="min-h-[100svh] md:min-h-[100dvh] px-8 py-12 md:px-6 md:py-24 bg-muted/50 flex items-center"
-      style={{ minHeight: "100svh" }}
+      className="min-h-[calc(100svh-4rem)] md:min-h-[calc(100dvh-4rem)] px-8 py-8 md:px-6 md:py-20 bg-muted/50 flex items-center"
     >
       <div className="w-full max-w-4xl mx-auto flex flex-col gap-8 md:gap-16">
         {/* Section header */}

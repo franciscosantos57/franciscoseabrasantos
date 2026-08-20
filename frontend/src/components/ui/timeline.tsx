@@ -119,7 +119,7 @@ function MobileTimelineCube({ index }: { index: number }) {
   const [phase, setPhase] = useState(index * 0.7);
 
   useAnimationFrame((time) => {
-    setPhase(time * 0.0026 + index * 0.7);
+    setPhase(time * 0.00135 + index * 0.7);
   });
 
   const faces = svgCubeFaces(34, 34, 30, phase * 1.35, phase * 0.95 + index * 0.45);

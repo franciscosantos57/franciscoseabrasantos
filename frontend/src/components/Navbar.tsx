@@ -9,6 +9,8 @@ const navLinks = [
   { label: "Contact", href: "#contact" },
 ];
 
+const NAV_HEIGHT = 64;
+
 interface NavbarProps {
   isDark: boolean;
   onToggleDark: () => void;
@@ -115,7 +117,11 @@ export default function Navbar({
     setMenuOpen(false);
     setThemeOpen(false);
     const id = href.replace("#", "");
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    const top = Math.max(0, element.getBoundingClientRect().top + window.scrollY - NAV_HEIGHT);
+    window.scrollTo({ top, behavior: "smooth" });
   };
 
   return (

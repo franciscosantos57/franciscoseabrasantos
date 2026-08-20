@@ -112,6 +112,8 @@ export function FloatingCubes() {
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
     const shapeCount = isMobile ? 12 : 18;
     let canvasCssWidth = 0;
+    let elapsed = 0;
+    let previousFrame: number | null = null;
 
     const initShapes = () => {
       const sign = () => (Math.random() < 0.5 ? 1 : -1);
@@ -164,6 +166,10 @@ export function FloatingCubes() {
     };
 
     const draw = (t: number) => {
+      const delta = previousFrame === null ? 16.7 : Math.min(t - previousFrame, 34);
+      previousFrame = t;
+      elapsed += delta;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const isDark = document.documentElement.classList.contains("dark");
       const mx = canUsePointer ? mouseRef.current.x : -9999;
@@ -171,7 +177,7 @@ export function FloatingCubes() {
       const [baseR, baseG, baseB] = getThemeRgb();
 
       for (const s of shapesRef.current) {
-        const breath = Math.sin(t * 0.001 * s.speed + s.phase);
+        const breath = Math.sin(elapsed * 0.001 * s.speed + s.phase);
         const size = s.baseSize * (1 + breath * 0.18);
 
         const dx = mx - s.x;
@@ -182,8 +188,8 @@ export function FloatingCubes() {
         const sizeFinal = size * (1 + inf * 0.9);
         const baseOp = s.baseOpacity * (isDark ? 2.2 : 3.2) * (1 + inf * 1.6);
 
-        const rotY = s.rotY + t * 0.001 * s.rotSpeedY;
-        const rotX = s.rotX + t * 0.001 * s.rotSpeedX;
+        const rotY = s.rotY + elapsed * 0.001 * s.rotSpeedY;
+        const rotX = s.rotX + elapsed * 0.001 * s.rotSpeedX;
         drawCube(ctx, s.x, s.y, sizeFinal, rotY, rotX, baseR, baseG, baseB, baseOp);
       }
 

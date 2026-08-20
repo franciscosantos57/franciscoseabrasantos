@@ -9,6 +9,16 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { useThemeColor } from "@/hooks/useThemeColor";
 
+const NAV_HEIGHT = 64;
+
+function scrollToSection(id: string) {
+  const element = document.getElementById(id);
+  if (!element) return;
+
+  const top = Math.max(0, element.getBoundingClientRect().top + window.scrollY - NAV_HEIGHT);
+  window.scrollTo({ top, behavior: "auto" });
+}
+
 function App() {
   useScrollReveal();
   const { isDark, toggle } = useDarkMode();
@@ -20,7 +30,7 @@ function App() {
       if (!id) return;
 
       requestAnimationFrame(() => {
-        document.getElementById(id)?.scrollIntoView({ block: "start" });
+        scrollToSection(id);
       });
     };
 
