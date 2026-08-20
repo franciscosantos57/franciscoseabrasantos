@@ -304,20 +304,26 @@ html.dark .home-bg-overlay {
   background: radial-gradient(ellipse 62% 58% at 50% 46%, rgba(42,42,42,0.65) 0%, transparent 100%);
 }
 
-/* ── Mobile home cubes: CSS animation starts immediately on first paint ───── */
+/* ── Mobile home cubes: compositor-friendly first-paint animation ─────────── */
 .mobile-floating-cubes {
   perspective: 900px;
+  transform: translateZ(0);
   transform-style: preserve-3d;
+  backface-visibility: hidden;
+  contain: layout paint;
 }
 .mobile-floating-cube {
   --cube-drift-x: 16px;
   --cube-drift-y: -18px;
   position: absolute;
+  transform: translate3d(0, 0, 0) rotateX(-18deg) rotateY(26deg);
   transform-style: preserve-3d;
   will-change: transform;
   animation-name: mobile-cube-float;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
+  animation-fill-mode: both;
+  backface-visibility: hidden;
 }
 .mobile-cube-face {
   position: absolute;

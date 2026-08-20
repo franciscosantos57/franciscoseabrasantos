@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 interface Shape {
   nx: number;
@@ -154,11 +154,11 @@ function CanvasFloatingCubes() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    if (!window.matchMedia("(min-width: 768px)").matches) return;
+
     const ctx = canvas.getContext("2d")!;
     const canUsePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    const shapeCount = isMobile ? 12 : 18;
-    let canvasCssWidth = 0;
+    const shapeCount = 18;
     let elapsed = 0;
     let previousFrame: number | null = null;
 
@@ -173,14 +173,14 @@ function CanvasFloatingCubes() {
           ny,
           x: nx * canvas.width,
           y: ny * canvas.height,
-          baseSize: isMobile ? 22 + Math.random() * 42 : 28 + Math.random() * 72,
+          baseSize: 28 + Math.random() * 72,
           phase: Math.random() * Math.PI * 2,
-          speed: isMobile ? 0.72 + Math.random() * 0.58 : 0.3 + Math.random() * 0.7,
-          baseOpacity: isMobile ? 0.04 + Math.random() * 0.06 : 0.045 + Math.random() * 0.09,
+          speed: 0.3 + Math.random() * 0.7,
+          baseOpacity: 0.045 + Math.random() * 0.09,
           rotY: Math.random() * Math.PI * 2,
           rotX: Math.random() * Math.PI * 2,
-          rotSpeedY: sign() * (isMobile ? 0.52 + Math.random() * 0.45 : 0.18 + Math.random() * 0.32),
-          rotSpeedX: sign() * (isMobile ? 0.24 + Math.random() * 0.26 : 0.08 + Math.random() * 0.16),
+          rotSpeedY: sign() * (0.18 + Math.random() * 0.32),
+          rotSpeedX: sign() * (0.08 + Math.random() * 0.16),
         };
       });
     };
@@ -197,11 +197,6 @@ function CanvasFloatingCubes() {
       const nextWidth = canvas.offsetWidth;
       const nextHeight = canvas.offsetHeight;
 
-      if (isMobile && canvasCssWidth && Math.abs(nextWidth - canvasCssWidth) < 2) {
-        return;
-      }
-
-      canvasCssWidth = nextWidth;
       canvas.width = nextWidth;
       canvas.height = nextHeight;
 
@@ -283,17 +278,10 @@ function CanvasFloatingCubes() {
 }
 
 export function FloatingCubes() {
-  const [isMobile, setIsMobile] = useState(() => (
-    typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches
-  ));
-
-  useEffect(() => {
-    const media = window.matchMedia("(max-width: 767px)");
-    const update = () => setIsMobile(media.matches);
-    update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
-  }, []);
-
-  return isMobile ? <MobileFloatingCubes /> : <CanvasFloatingCubes />;
+  return (
+    <>
+      <MobileFloatingCubes />
+      <CanvasFloatingCubes />
+    </>
+  );
 }
