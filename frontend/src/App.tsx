@@ -5,6 +5,7 @@ import Home from "@/components/sections/Home";
 import Experience from "@/components/sections/Experience";
 import Projects from "@/components/sections/Projects";
 import Contact from "@/components/sections/Contact";
+import { InteractiveCursor } from "@/components/ui/InteractiveCursor";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { useThemeColor } from "@/hooks/useThemeColor";
@@ -56,6 +57,7 @@ function App() {
           <Projects />
           <Contact />
         </main>
+        <InteractiveCursor />
       </div>
     </TooltipProvider>
   );

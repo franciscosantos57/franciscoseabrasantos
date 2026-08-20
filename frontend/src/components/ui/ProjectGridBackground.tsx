@@ -157,7 +157,6 @@ export function ProjectGridBackground() {
     let height = 0;
     let dpr = 1;
     let raf = 0;
-    let running = true;
     const startTime = performance.now();
     let cols = 0;
     let rows = 0;
@@ -183,7 +182,6 @@ export function ProjectGridBackground() {
 
     const render = (now: number) => {
       raf = 0;
-      if (!running) return;
 
       const isDark = document.documentElement.classList.contains("dark");
       const themeRgb = getThemeRgb();
@@ -209,45 +207,20 @@ export function ProjectGridBackground() {
       }
     };
 
-    const start = () => {
-      if (reducedMotion || raf) return;
-      running = true;
-      raf = requestAnimationFrame(render);
-    };
-
-    const stop = () => {
-      running = false;
-      cancelAnimationFrame(raf);
-      raf = 0;
-    };
-
     resize();
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(section);
 
-    const visibilityObserver = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          start();
-        } else {
-          stop();
-        }
-      },
-      { threshold: 0.05 },
-    );
-    visibilityObserver.observe(section);
-
     if (reducedMotion) {
       render(performance.now());
-      running = false;
     } else {
-      start();
+      raf = requestAnimationFrame(render);
     }
 
     return () => {
-      stop();
+      cancelAnimationFrame(raf);
+      raf = 0;
       resizeObserver.disconnect();
-      visibilityObserver.disconnect();
     };
   }, []);
 

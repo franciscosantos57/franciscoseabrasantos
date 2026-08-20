@@ -165,6 +165,20 @@ html.dark {
   button, [role="button"], a {
     cursor: pointer;
   }
+  @media (hover: hover) and (pointer: fine) {
+    html.site-cursor-enabled,
+    html.site-cursor-enabled * {
+      cursor: none !important;
+    }
+  }
+  ::selection {
+    color: var(--primary-foreground);
+    background: rgb(var(--theme-rgb) / 0.32);
+  }
+  ::-moz-selection {
+    color: var(--primary-foreground);
+    background: rgb(var(--theme-rgb) / 0.32);
+  }
 }
 
 .theme-gradient-text {

@@ -49,7 +49,7 @@ export default function Contact() {
               rel="noopener noreferrer"
               className="block group"
             >
-              <div className="bg-card border border-border rounded-xl md:rounded-2xl p-4 md:p-6 flex flex-col gap-3 md:gap-5 hover:border-primary/50 hover:shadow-md hover:shadow-primary/10 transition-all duration-300">
+              <div className="bg-card border border-border rounded-xl md:rounded-2xl p-4 md:p-6 flex flex-col gap-3 md:gap-5 hover:border-primary/70 hover:shadow-md hover:shadow-primary/10 transition-all duration-200">
                 <div className="flex items-start justify-between">
                   <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
                     <Icon className="h-4 w-4 md:h-5 md:w-5" />
