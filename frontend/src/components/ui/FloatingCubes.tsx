@@ -15,21 +15,6 @@ interface Shape {
   rotSpeedX: number;
 }
 
-const MOBILE_CUBES = [
-  { left: "8%", top: "12%", size: 42, duration: 8.4, delay: -5.6, opacity: 0.3, dx: "16px", dy: "-18px" },
-  { left: "72%", top: "10%", size: 54, duration: 9.6, delay: -1.4, opacity: 0.28, dx: "-18px", dy: "22px" },
-  { left: "83%", top: "28%", size: 72, duration: 10.8, delay: -7.2, opacity: 0.26, dx: "12px", dy: "-24px" },
-  { left: "10%", top: "34%", size: 58, duration: 9.2, delay: -3.8, opacity: 0.22, dx: "22px", dy: "16px" },
-  { left: "31%", top: "43%", size: 44, duration: 7.8, delay: -6.2, opacity: 0.24, dx: "-14px", dy: "-20px" },
-  { left: "58%", top: "50%", size: 66, duration: 10.2, delay: -2.5, opacity: 0.2, dx: "18px", dy: "18px" },
-  { left: "86%", top: "55%", size: 46, duration: 8.8, delay: -4.3, opacity: 0.25, dx: "-16px", dy: "16px" },
-  { left: "13%", top: "70%", size: 78, duration: 11.4, delay: -8.8, opacity: 0.24, dx: "18px", dy: "-18px" },
-  { left: "47%", top: "75%", size: 52, duration: 8.6, delay: -1.9, opacity: 0.2, dx: "-18px", dy: "20px" },
-  { left: "72%", top: "82%", size: 68, duration: 10.6, delay: -6.7, opacity: 0.23, dx: "14px", dy: "-22px" },
-  { left: "5%", top: "88%", size: 44, duration: 8.2, delay: -3.1, opacity: 0.27, dx: "20px", dy: "14px" },
-  { left: "90%", top: "88%", size: 40, duration: 7.6, delay: -5.1, opacity: 0.26, dx: "-18px", dy: "-16px" },
-];
-
 function getThemeRgb() {
   const value = getComputedStyle(document.documentElement)
     .getPropertyValue("--theme-rgb")
@@ -113,39 +98,7 @@ function drawCube(
   }
 }
 
-function MobileFloatingCubes() {
-  return (
-    <div className="mobile-floating-cubes absolute inset-0 md:hidden" aria-hidden="true">
-      {MOBILE_CUBES.map((cube, index) => (
-        <div
-          key={index}
-          className="mobile-floating-cube"
-          style={{
-            left: cube.left,
-            top: cube.top,
-            width: cube.size,
-            height: cube.size,
-            opacity: cube.opacity,
-            animationDuration: `${cube.duration}s`,
-            animationDelay: `${cube.delay}s`,
-            ["--cube-size" as string]: `${cube.size}px`,
-            ["--cube-drift-x" as string]: cube.dx,
-            ["--cube-drift-y" as string]: cube.dy,
-          }}
-        >
-          <span className="mobile-cube-face mobile-cube-front" />
-          <span className="mobile-cube-face mobile-cube-back" />
-          <span className="mobile-cube-face mobile-cube-right" />
-          <span className="mobile-cube-face mobile-cube-left" />
-          <span className="mobile-cube-face mobile-cube-top" />
-          <span className="mobile-cube-face mobile-cube-bottom" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function CanvasFloatingCubes() {
+export function FloatingCubes() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const shapesRef = useRef<Shape[]>([]);
@@ -154,11 +107,11 @@ function CanvasFloatingCubes() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    if (!window.matchMedia("(min-width: 768px)").matches) return;
-
     const ctx = canvas.getContext("2d")!;
     const canUsePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const shapeCount = 18;
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const shapeCount = isMobile ? 12 : 18;
+    let canvasCssWidth = 0;
     let elapsed = 0;
     let previousFrame: number | null = null;
 
@@ -173,14 +126,14 @@ function CanvasFloatingCubes() {
           ny,
           x: nx * canvas.width,
           y: ny * canvas.height,
-          baseSize: 28 + Math.random() * 72,
+          baseSize: isMobile ? 22 + Math.random() * 42 : 28 + Math.random() * 72,
           phase: Math.random() * Math.PI * 2,
-          speed: 0.3 + Math.random() * 0.7,
-          baseOpacity: 0.045 + Math.random() * 0.09,
+          speed: isMobile ? 0.72 + Math.random() * 0.58 : 0.3 + Math.random() * 0.7,
+          baseOpacity: isMobile ? 0.04 + Math.random() * 0.06 : 0.045 + Math.random() * 0.09,
           rotY: Math.random() * Math.PI * 2,
           rotX: Math.random() * Math.PI * 2,
-          rotSpeedY: sign() * (0.18 + Math.random() * 0.32),
-          rotSpeedX: sign() * (0.08 + Math.random() * 0.16),
+          rotSpeedY: sign() * (isMobile ? 0.52 + Math.random() * 0.45 : 0.18 + Math.random() * 0.32),
+          rotSpeedX: sign() * (isMobile ? 0.24 + Math.random() * 0.26 : 0.08 + Math.random() * 0.16),
         };
       });
     };
@@ -197,6 +150,11 @@ function CanvasFloatingCubes() {
       const nextWidth = canvas.offsetWidth;
       const nextHeight = canvas.offsetHeight;
 
+      if (isMobile && canvasCssWidth && Math.abs(nextWidth - canvasCssWidth) < 2) {
+        return;
+      }
+
+      canvasCssWidth = nextWidth;
       canvas.width = nextWidth;
       canvas.height = nextHeight;
 
@@ -272,16 +230,7 @@ function CanvasFloatingCubes() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 hidden h-full w-full pointer-events-none md:block"
+      className="absolute inset-0 w-full h-full pointer-events-none"
     />
-  );
-}
-
-export function FloatingCubes() {
-  return (
-    <>
-      <MobileFloatingCubes />
-      <CanvasFloatingCubes />
-    </>
   );
 }
