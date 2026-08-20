@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Shape {
   nx: number;
@@ -14,6 +14,21 @@ interface Shape {
   rotSpeedY: number;
   rotSpeedX: number;
 }
+
+const MOBILE_CUBES = [
+  { left: "8%", top: "12%", size: 42, duration: 8.4, delay: -5.6, opacity: 0.3, dx: "16px", dy: "-18px" },
+  { left: "72%", top: "10%", size: 54, duration: 9.6, delay: -1.4, opacity: 0.28, dx: "-18px", dy: "22px" },
+  { left: "83%", top: "28%", size: 72, duration: 10.8, delay: -7.2, opacity: 0.26, dx: "12px", dy: "-24px" },
+  { left: "10%", top: "34%", size: 58, duration: 9.2, delay: -3.8, opacity: 0.22, dx: "22px", dy: "16px" },
+  { left: "31%", top: "43%", size: 44, duration: 7.8, delay: -6.2, opacity: 0.24, dx: "-14px", dy: "-20px" },
+  { left: "58%", top: "50%", size: 66, duration: 10.2, delay: -2.5, opacity: 0.2, dx: "18px", dy: "18px" },
+  { left: "86%", top: "55%", size: 46, duration: 8.8, delay: -4.3, opacity: 0.25, dx: "-16px", dy: "16px" },
+  { left: "13%", top: "70%", size: 78, duration: 11.4, delay: -8.8, opacity: 0.24, dx: "18px", dy: "-18px" },
+  { left: "47%", top: "75%", size: 52, duration: 8.6, delay: -1.9, opacity: 0.2, dx: "-18px", dy: "20px" },
+  { left: "72%", top: "82%", size: 68, duration: 10.6, delay: -6.7, opacity: 0.23, dx: "14px", dy: "-22px" },
+  { left: "5%", top: "88%", size: 44, duration: 8.2, delay: -3.1, opacity: 0.27, dx: "20px", dy: "14px" },
+  { left: "90%", top: "88%", size: 40, duration: 7.6, delay: -5.1, opacity: 0.26, dx: "-18px", dy: "-16px" },
+];
 
 function getThemeRgb() {
   const value = getComputedStyle(document.documentElement)
@@ -98,7 +113,39 @@ function drawCube(
   }
 }
 
-export function FloatingCubes() {
+function MobileFloatingCubes() {
+  return (
+    <div className="mobile-floating-cubes absolute inset-0 md:hidden" aria-hidden="true">
+      {MOBILE_CUBES.map((cube, index) => (
+        <div
+          key={index}
+          className="mobile-floating-cube"
+          style={{
+            left: cube.left,
+            top: cube.top,
+            width: cube.size,
+            height: cube.size,
+            opacity: cube.opacity,
+            animationDuration: `${cube.duration}s`,
+            animationDelay: `${cube.delay}s`,
+            ["--cube-size" as string]: `${cube.size}px`,
+            ["--cube-drift-x" as string]: cube.dx,
+            ["--cube-drift-y" as string]: cube.dy,
+          }}
+        >
+          <span className="mobile-cube-face mobile-cube-front" />
+          <span className="mobile-cube-face mobile-cube-back" />
+          <span className="mobile-cube-face mobile-cube-right" />
+          <span className="mobile-cube-face mobile-cube-left" />
+          <span className="mobile-cube-face mobile-cube-top" />
+          <span className="mobile-cube-face mobile-cube-bottom" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CanvasFloatingCubes() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const shapesRef = useRef<Shape[]>([]);
@@ -230,7 +277,23 @@ export function FloatingCubes() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
+      className="absolute inset-0 hidden h-full w-full pointer-events-none md:block"
     />
   );
+}
+
+export function FloatingCubes() {
+  const [isMobile, setIsMobile] = useState(() => (
+    typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches
+  ));
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  return isMobile ? <MobileFloatingCubes /> : <CanvasFloatingCubes />;
 }
