@@ -80,11 +80,11 @@ function applyThemeHue(hue: number) {
 }
 
 export function useThemeColor() {
-  const initialState = useRef(readInitialState());
-  const [isMobile, setIsMobile] = useState(initialState.current.isMobile);
-  const [autoEnabled, setAutoEnabled] = useState(initialState.current.autoEnabled);
-  const [hue, setHue] = useState(initialState.current.hue);
-  const hueRef = useRef(initialState.current.hue);
+  const [initialState] = useState(readInitialState);
+  const [isMobile, setIsMobile] = useState(initialState.isMobile);
+  const [autoEnabled, setAutoEnabled] = useState(initialState.autoEnabled);
+  const [hue, setHue] = useState(initialState.hue);
+  const hueRef = useRef(initialState.hue);
 
   useEffect(() => {
     const mq = window.matchMedia(MOBILE_QUERY);
@@ -120,8 +120,15 @@ export function useThemeColor() {
     let raf = 0;
     let previous = performance.now();
     let lastStateSync = previous;
+    let lastPaint = previous;
 
     const tick = (now: number) => {
+      if (document.hidden || now - lastPaint < 80) {
+        if (document.hidden) previous = now;
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      lastPaint = now;
       const delta = now - previous;
       previous = now;
       hueRef.current = normalizeHue(hueRef.current + (delta / FULL_CYCLE_MS) * 360);

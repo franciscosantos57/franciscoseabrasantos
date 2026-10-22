@@ -1,5 +1,5 @@
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useEffect } from "react";
+import { memo, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Home from "@/components/sections/Home";
 import Experience from "@/components/sections/Experience";
@@ -10,6 +10,10 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { useThemeColor } from "@/hooks/useThemeColor";
 
+const MemoHome = memo(Home);
+const MemoExperience = memo(Experience);
+const MemoProjects = memo(Projects);
+const MemoContact = memo(Contact);
 const NAV_HEIGHT = 64;
 
 function scrollToSection(id: string) {
@@ -52,10 +56,10 @@ function App() {
           onToggleAutoColor={toggleAutoColor}
         />
         <main>
-          <Home />
-          <Experience />
-          <Projects />
-          <Contact />
+          <MemoHome />
+          <MemoExperience />
+          <MemoProjects />
+          <MemoContact />
         </main>
         <InteractiveCursor />
       </div>

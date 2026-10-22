@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { visibleAnimation } from "@/lib/visibleAnimation";
 
 const CELL = 28;
 const MAX_DPR = 1.35;
@@ -156,7 +157,6 @@ export function ProjectGridBackground() {
     let width = 0;
     let height = 0;
     let dpr = 1;
-    let raf = 0;
     const startTime = performance.now();
     let cols = 0;
     let rows = 0;
@@ -181,8 +181,6 @@ export function ProjectGridBackground() {
     };
 
     const render = (now: number) => {
-      raf = 0;
-
       const isDark = document.documentElement.classList.contains("dark");
       const themeRgb = getThemeRgb();
       const progress = reducedMotion ? 0.48 : ((now - startTime) % DURATION) / DURATION;
@@ -201,25 +199,16 @@ export function ProjectGridBackground() {
         const colorIntensity = Math.pow(intensity, 1.18);
         drawPrism(ctx, cell.x, cell.y, liftIntensity * MAX_LIFT, colorIntensity, isDark, themeRgb);
       });
-
-      if (!reducedMotion) {
-        raf = requestAnimationFrame(render);
-      }
     };
 
     resize();
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(section);
 
-    if (reducedMotion) {
-      render(performance.now());
-    } else {
-      raf = requestAnimationFrame(render);
-    }
+    const stopAnimation = visibleAnimation(section, render);
 
     return () => {
-      cancelAnimationFrame(raf);
-      raf = 0;
+      stopAnimation();
       resizeObserver.disconnect();
     };
   }, []);

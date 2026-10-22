@@ -7,6 +7,7 @@ export function useScrollReveal() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("reveal-visible");
+            io.unobserve(entry.target);
           }
         });
       },

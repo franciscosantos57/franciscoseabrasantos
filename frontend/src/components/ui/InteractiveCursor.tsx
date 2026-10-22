@@ -56,13 +56,16 @@ export function InteractiveCursor() {
     let visible = false;
 
     const render = () => {
+      raf = 0;
       pos.haloX += (pos.x - pos.haloX) * 0.32;
       pos.haloY += (pos.y - pos.haloY) * 0.32;
       pos.stretch += (1 - pos.stretch) * 0.2;
 
       dot.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, -50%)`;
       halo.style.transform = `translate3d(${pos.haloX}px, ${pos.haloY}px, 0) translate(-50%, -50%) rotate(${pos.angle}deg) scaleX(${pos.stretch})`;
-      raf = requestAnimationFrame(render);
+      if (visible && (Math.abs(pos.x - pos.haloX) > 0.05 || Math.abs(pos.y - pos.haloY) > 0.05 || Math.abs(pos.stretch - 1) > 0.001)) {
+        raf = requestAnimationFrame(render);
+      }
     };
 
     const handlePointerMove = (event: PointerEvent) => {
@@ -86,6 +89,8 @@ export function InteractiveCursor() {
         setMode(nextMode);
       }
 
+      if (!raf) raf = requestAnimationFrame(render);
+
       if (!visible) {
         visible = true;
         dot.style.opacity = "1";
@@ -95,6 +100,8 @@ export function InteractiveCursor() {
 
     const handlePointerLeave = () => {
       visible = false;
+      cancelAnimationFrame(raf);
+      raf = 0;
       dot.style.opacity = "0";
       halo.style.opacity = "0";
     };
@@ -102,7 +109,6 @@ export function InteractiveCursor() {
     const handlePointerDown = () => setPressed(true);
     const handlePointerUp = () => setPressed(false);
 
-    raf = requestAnimationFrame(render);
     window.addEventListener("pointermove", handlePointerMove, { passive: true });
     window.addEventListener("pointerleave", handlePointerLeave);
     window.addEventListener("pointerdown", handlePointerDown, { passive: true });

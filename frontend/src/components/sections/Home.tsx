@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { FloatingCubes } from "@/components/ui/FloatingCubes";
 import data from "@/data/portfolio.json";
-import photoSrc from "@/assets/photo.jpeg";
+import photoSrc from "@/assets/photo-optimized.jpg";
+import { useState } from "react";
 
 const socialLinks = [
   {
@@ -29,6 +30,8 @@ const socialLinks = [
 ];
 
 export default function Home() {
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const [photoReady, setPhotoReady] = useState(false);
   const scrollToNext = () => {
     document.getElementById("experience")?.scrollIntoView({ behavior: "smooth" });
   };
@@ -50,27 +53,27 @@ export default function Home() {
         <div className="home-bg-overlay absolute inset-0" />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center text-center max-w-2xl gap-5 md:gap-6">
+      <div className="home-intro relative z-10 flex flex-col items-center text-center max-w-2xl gap-5 md:gap-6">
         {/* Avatar */}
-        <div className="reveal relative group">
+        <div className="relative group">
           <div className="absolute -inset-1.5 bg-linear-to-r from-primary to-primary/55 rounded-full blur-md opacity-40 group-hover:opacity-70 transition duration-500" />
           <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-2 border-primary/40 bg-muted flex items-center justify-center">
-            <img
+            {photoFailed ? <span className="text-4xl font-bold text-muted-foreground">FS</span> : <img
+              width={176}
+              height={176}
+              fetchPriority="high"
+              decoding="async"
               src={photoSrc}
               alt={data.personal.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-                (e.target as HTMLImageElement).parentElement!.innerHTML = `
-                  <span class="text-4xl font-bold text-muted-foreground">FS</span>
-                `;
-              }}
-            />
+              className={`w-full h-full object-cover transition-opacity duration-300 motion-reduce:transition-none ${photoReady ? "opacity-100" : "opacity-0"}`}
+              onLoad={() => setPhotoReady(true)}
+              onError={() => setPhotoFailed(true)}
+            />}
           </div>
         </div>
 
         {/* Name */}
-        <div className="reveal reveal-delay-1 flex w-full flex-col gap-2">
+        <div className="flex w-full flex-col gap-2">
           <h1 className="whitespace-nowrap text-[clamp(1.18rem,5.1vw,1.75rem)] md:text-5xl font-bold tracking-tight">
             <span className="theme-gradient-text">
               {data.personal.name}
@@ -80,12 +83,12 @@ export default function Home() {
         </div>
 
         {/* Description */}
-        <p className="reveal reveal-delay-2 text-muted-foreground dark:text-white/75 leading-relaxed text-sm md:text-base max-w-xl">
+        <p className="text-muted-foreground dark:text-white/75 leading-relaxed text-sm md:text-base max-w-xl">
           {data.personal.description}
         </p>
 
         {/* Social icons */}
-        <div className="reveal reveal-delay-3 flex items-center gap-3">
+        <div className="flex items-center gap-3">
           {socialLinks.map(({ label, href, icon: Icon }) => (
             <Tooltip key={label}>
               <TooltipTrigger asChild>
@@ -110,7 +113,7 @@ export default function Home() {
         </div>
 
         {/* CV download */}
-        <a className="reveal reveal-delay-4" href={data.personal.cv} download>
+        <a href={data.personal.cv} download>
           <Button
             size="lg"
             className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-0.5 px-6 py-2.5 md:px-8 md:py-3 text-sm md:text-base"

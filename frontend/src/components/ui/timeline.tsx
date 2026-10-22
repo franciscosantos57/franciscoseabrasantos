@@ -5,8 +5,10 @@ import {
   useTransform,
   motion,
   useMotionValueEvent,
-  useAnimationFrame,
+  useInView,
+  useReducedMotion,
 } from "framer-motion";
+import { visibleAnimation } from "@/lib/visibleAnimation";
 import React, { useRef, useState, useEffect, useCallback } from "react";
 
 export interface TimelineEntry {
@@ -118,14 +120,21 @@ function svgCubeFaces(
 function MobileTimelineCube({ index }: { index: number }) {
   const [phase, setPhase] = useState(index * 0.7);
 
-  useAnimationFrame((time) => {
-    setPhase(time * 0.00135 + index * 0.7);
-  });
+  const ref = useRef<SVGSVGElement>(null);
+  const inView = useInView(ref);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (!inView || reducedMotion || !ref.current) return;
+    return visibleAnimation(ref.current, (time) => {
+      setPhase(time * 0.00135 + index * 0.7);
+    });
+  }, [inView, reducedMotion, index]);
 
   const faces = svgCubeFaces(34, 34, 30, phase * 1.35, phase * 0.95 + index * 0.45);
 
   return (
-    <svg viewBox="0 0 68 68" className="h-17 w-17" aria-hidden="true">
+    <svg ref={ref} viewBox="0 0 68 68" className="h-17 w-17" aria-hidden="true">
       <circle cx="34" cy="34" r="30" fill="var(--background)" />
       {faces.map(({ key: fk, points, shade }) => (
         <polygon
@@ -243,10 +252,12 @@ export function CurvedTimeline({ data }: { data: TimelineEntry[] }) {
         if (latest >= thresh)         next[i] = true;
         else if (latest < thresh - 0.04) next[i] = false;
       });
-      return next;
+      return next.every((value, i) => value === prev[i]) ? prev : next;
     });
-    setWeavingPhase(latest * Math.PI * 2);
-    setTipProgress(latest);
+    if (!isMobile) {
+      setWeavingPhase(latest * Math.PI * 2);
+      setTipProgress(latest);
+    }
   });
 
   // ── Tip fade mask (fades the animated leading edge of the strands) ──────────

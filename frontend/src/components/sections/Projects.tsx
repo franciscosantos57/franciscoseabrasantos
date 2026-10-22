@@ -78,6 +78,8 @@ function FeaturedCard({ project, index }: { project: Project; index: number }) {
       {cover && (
         <div className="relative w-full aspect-video sm:w-2/5 sm:aspect-auto shrink-0 overflow-hidden">
           <img
+            loading="lazy"
+            decoding="async"
             src={cover}
             alt={project.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -106,6 +108,8 @@ function SmallCard({ project, index }: { project: Project; index: number }) {
       {cover && (
         <div className="relative aspect-video overflow-hidden">
           <img
+            loading="lazy"
+            decoding="async"
             src={cover}
             alt={project.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { visibleAnimation } from "@/lib/visibleAnimation";
 
 interface Shape {
   nx: number;
@@ -102,7 +103,6 @@ export function FloatingCubes() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const shapesRef = useRef<Shape[]>([]);
-  const rafRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -193,7 +193,6 @@ export function FloatingCubes() {
         drawCube(ctx, s.x, s.y, sizeFinal, rotY, rotX, baseR, baseG, baseB, baseOp);
       }
 
-      rafRef.current = requestAnimationFrame(draw);
     };
 
     resize();
@@ -202,7 +201,9 @@ export function FloatingCubes() {
     const onMove = (e: PointerEvent) => {
       // Ignore touch/stylus — only real mouse pointer should trigger the proximity effect.
       if (e.pointerType !== 'mouse') return;
+      if (!canvas.getClientRects().length) return;
       const rect = canvas.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
       mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
     const onLeave = (e: PointerEvent) => {
@@ -214,11 +215,10 @@ export function FloatingCubes() {
       window.addEventListener("pointerleave", onLeave);
     }
 
-    draw(performance.now());
+    const stopAnimation = visibleAnimation(canvas, draw);
 
     return () => {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = 0;
+      stopAnimation();
       window.removeEventListener("resize", resize);
       if (canUsePointer) {
         window.removeEventListener("pointermove", onMove);

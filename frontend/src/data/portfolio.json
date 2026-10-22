@@ -1,7 +1,7 @@
 {
   "personal": {
     "name": "Francisco Seabra Santos",
-    "role": "Computer Engineering Student @ UC",
+    "role": "MSc in Artificial Inteligence @ UZH",
     "description": "Envision and build something interesting. Let's do it together.",
     "photo": "/photo.jpeg",
     "links": {
@@ -13,6 +13,20 @@
     "cv": "CurriculumVitae.pdf"
   },
   "experience": [
+    {
+      "id": 6,
+      "title": "MSc in Artificial Inteligence",
+      "company": "University of Zürich (UZH)",
+      "location": "Zurich, Switzerland",
+      "period": "Sep 2026 - Present",
+      "description": "Specializing in Artificial Intelligence, with coursework in Reinforcement Learning, Foundations of Data Science, Vision Algorithms for Mobile Robotics, and Advanced Topics in AI.",
+      "tags": [
+        "Artificial Intelligence",
+        "Reinforcement Learning",
+        "Data Science",
+        "Computer Vision"
+      ]
+    },
     {
       "id": 1,
       "title": "Freelance AI Engineer & Software Developer",

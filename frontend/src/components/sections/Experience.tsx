@@ -1,12 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { CurvedTimeline } from "@/components/ui/timeline";
-import { MapPin } from "lucide-react";
+import { GraduationCap, MapPin } from "lucide-react";
 import data from "@/data/portfolio.json";
 import importrustSrc from "@/assets/importrust.jpg";
 import jeknowledgeSrc from "@/assets/jeknowledge.jpg";
 import neiSrc from "@/assets/nei.jpg";
 import deiSrc from "@/assets/dei.jpg";
 import ucSrc from "@/assets/uc.jpg";
+import uzhSrc from "@/assets/uzh.jpg";
 
 const COMPANY_ICONS: Record<number, string> = {
   1: importrustSrc,
@@ -14,6 +15,7 @@ const COMPANY_ICONS: Record<number, string> = {
   3: neiSrc,
   4: deiSrc,
   5: ucSrc,
+  6: uzhSrc,
 };
 
 export default function Experience() {
@@ -29,12 +31,22 @@ export default function Experience() {
 
           {COMPANY_ICONS[item.id] && (
             <img
+              loading="lazy"
+              decoding="async"
+              width={52}
+              height={52}
               src={COMPANY_ICONS[item.id]}
               alt={item.company}
               className={`w-11 h-11 md:w-13 md:h-13 rounded-xl border border-primary/20 shrink-0 shadow-sm ${
-                item.id === 5 ? "bg-white object-contain p-1.5" : "object-cover"
+                (item.id === 5 || item.id === 6) ? "bg-white object-contain p-1.5" : "object-cover"
               }`}
             />
+          )}
+
+          {!COMPANY_ICONS[item.id] && (
+            <div className="w-11 h-11 md:w-13 md:h-13 rounded-xl border border-primary/20 shrink-0 shadow-sm bg-primary/8 flex items-center justify-center" aria-hidden="true">
+              <GraduationCap className="w-6 h-6 text-primary" />
+            </div>
           )}
 
           <div className="flex-1 min-w-0">
