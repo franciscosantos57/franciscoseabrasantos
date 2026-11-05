@@ -155,9 +155,6 @@ html.dark {
     scrollbar-width: none;
     scroll-padding-top: 4rem;
   }
-  section[id] {
-    scroll-margin-top: 4rem;
-  }
   html::-webkit-scrollbar,
   body::-webkit-scrollbar {
     display: none;
